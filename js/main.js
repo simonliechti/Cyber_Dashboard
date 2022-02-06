@@ -214,6 +214,7 @@ const loadModels = function(){ // Load gltf, populate global mesh variables, dis
       //
       //
       modelsLoaded = true;
+
       initializeScene();
       focusChange("switzerland");
   });
@@ -234,56 +235,88 @@ const loadData = function(){
   //fallback when launched from playcanvas server
   //
 
-  if(window.location.hostname == '127.0.0.1' || window.location.hostname == 'playcanv.as'){
-      databaseEndpointSwiss = 'https://cyber.devedis.dev/list';
-      databaseEndpointWorld = 'https://cyber.devedis.dev/world';
-      console.log('Fallback to Devedis server');
-      console.log('Database endpoint: ' + databaseEndpointSwiss);
-      console.log('Datababse endpoint World: ' + databaseEndpointWorld);
-    }
+  // if(window.location.hostname == '127.0.0.1' || window.location.hostname == 'playcanv.as'){
+  //     databaseEndpointSwiss = 'https://cyber.devedis.dev/list';
+  //     databaseEndpointWorld = 'https://cyber.devedis.dev/world';
+  //     console.log('Fallback to Devedis server');
+  //     console.log('Database endpoint: ' + databaseEndpointSwiss);
+  //     console.log('Datababse endpoint World: ' + databaseEndpointWorld);
+  //   }
 
 
   loadJsonFromRemote(databaseEndpointSwiss, function(data) {
-          // self.attacks = data;
-          // nullActors();
-          dataSwiss = data;
-          for(i=0; i<dataSwiss.length; i++){
-              var e = dataSwiss[i];
-              if(e.threatActor === null){
-                  e.threatActor = {name: 'Unknown', campaignDescription: 'The threat actor has not yet been identified.', country: 'Unknown', motivations: [], aliases:[]};
-              }
-          }
-          initializeScene();
+    //only try fallback once
 
+    if(data !== 404){
+      // self.attacks = data;
+      // nullActors();
+      dataSwiss = data;
+      for(i=0; i<dataSwiss.length; i++){
+          var e = dataSwiss[i];
+          if(e.threatActor === null){
+              e.threatActor = {name: 'Unknown', campaignDescription: 'The threat actor has not yet been identified.', country: 'Unknown', motivations: [], aliases:[]};
+          }
+      }
+      initializeScene();
+    }
+    if(data == 404){
+      console.log("fallback to devedis server for endpoint /api/list");
+      loadJsonFromRemote('https://cyber.devedis.dev/list', function(data){
+        dataSwiss = data;
+        for(i=0; i<dataSwiss.length; i++){
+            var e = dataSwiss[i];
+            if(e.threatActor === null){
+                e.threatActor = {name: 'Unknown', campaignDescription: 'The threat actor has not yet been identified.', country: 'Unknown', motivations: [], aliases:[]};
+            }
+        }
+        initializeScene();
+      });
+    }
   });
 
   loadJsonFromRemote(databaseEndpointWorld, function(data) {
-          // self.attacks = data;
-          // nullActors();
-          // self.app.fire('UI:INIT', self.attacks);
-          dataWorld = data;
-          initializeScene();
 
+    if(data !== 404){
+      dataWorld = data;
+      initializeScene();
+    }
+
+    if(data == 404){
+      console.log("fallback to devedis server");
+      loadJsonFromRemote('https://cyber.devedis.dev/world', function(data){
+        dataWorld = data;
+        initializeScene();
+      });
+    }
   });
 
 
 }
 
-const loadJsonFromRemote = function (url, callback) { //function to load and parse Json file from remote
+const loadJsonFromRemote = function (url, callback){ //function to load and parse Json file from remote
+  console.log("loading Json from remote ");
+  var self = this;
+  var xhr = new XMLHttpRequest();
 
-    var self = this;
-    var xhr = new XMLHttpRequest();
+  xhr.onreadystatechange = function() {
 
-    xhr.addEventListener("load", function () {
-        callback(JSON.parse(xhr.response));
-    });
+    //callback with already parsed JSON
+    if (this.readyState == 4 && this.status == 200) {
+       callback(JSON.parse(xhr.response));
+    }
 
-    xhr.onerror = function(){
-        //onError();
-    };
+    //callback with error status
+    if(this.readyState == 4 && this.status == 404){
+      callback(this.status);
+    }
+  }
 
-    xhr.open("GET", url);
-    xhr.send();
+  xhr.onerror = function(){
+    console.log("Loading data was not successful.");
+  };
+
+  xhr.open("GET", url);
+  xhr.send();
 
 };
 
@@ -532,14 +565,10 @@ const addRenderObservables = function(){ //Update Functions beforeRender & after
 }
 
 const initializeScene = function(){
-  if(modelsLoaded == true){
+  if(modelsLoaded == true && dataSwiss && dataWorld){
+
     addPointerEvents();
     addRenderObservables();
-
-    // document.onpointermove = function(event){
-    //   console.log(event);
-    // }
-
     console.log("initialize scene");
   }
 
