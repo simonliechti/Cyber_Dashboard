@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="stylesheet" href="/css/master.css">
+</head>
+
+<body>
+
+
+  <div class="renderHost">
+    <div id="backdrop"></canvas>
+    <canvas id="renderCanvas" touch-action="none"></canvas>
+  </div>
+
+  <div id="containerUI" >
+    <div id="tooltip">Tooltip</div>
+    <div id='sidebar_left'>Sidebar Left
+      <div id= "logo">logo</div>
+      <div id= "filter">filter</div>
+      <div id= "attributionList">
+        <div class="attributionButton">
+           <label>
+              <input type="checkbox" value="Attribution 01" checked><span>Attribution 01</span>
+           </label>
+        </div>
+        <div class="attributionButton">
+           <label>
+              <input type="checkbox" value="Attribution 02" checked><span>Attribution 02</span>
+           </label>
+        </div>
+      </div>
+      <div id= "attributionListButtons">All / None</div>
+    </div>
+    <div id='header'>
+      <div id="headerTitel">Cyber Threat Center</div>
+      <div id="modeSelection_Wrapper">
+        <ul>
+          <li><input type="button" class="modeButton" id="buttonModeSwitzerland" value="Switzerland"></li>
+          <li><input type="button" class="modeButton" id="buttonModeWorld" value="World"></li>
+        </ul>
+       </div>
+    </div>
+
+    <div id='sidebar_right'>Sidebar Right</div>
+    <div id='timeline'>timeline</div>
+  </div>
+
+
+  <script src="https://cdn.babylonjs.com/babylon.js"></script>
+  <script src="js\focusModes.js"></script>
+  <script src="https://cdn.babylonjs.com/loaders/babylonjs.loaders.js"></script>
+  <script src="js\main.js"></script>
+
+
+
+</body>
+</html>
+
+<!--
