@@ -228,28 +228,11 @@ const loadData = function(){
   var databaseEndpointSwiss = slashes.concat(host).concat('/api/list');
   var databaseEndpointWorld = slashes.concat(host).concat('/api/world');
 
-
   console.log('Datababse endpoint: ' + databaseEndpointSwiss);
   console.log('Datababse endpoint World: ' + databaseEndpointWorld);
 
-  //fallback when launched from playcanvas server
-  //
-
-  // if(window.location.hostname == '127.0.0.1' || window.location.hostname == 'playcanv.as'){
-  //     databaseEndpointSwiss = 'https://cyber.devedis.dev/list';
-  //     databaseEndpointWorld = 'https://cyber.devedis.dev/world';
-  //     console.log('Fallback to Devedis server');
-  //     console.log('Database endpoint: ' + databaseEndpointSwiss);
-  //     console.log('Datababse endpoint World: ' + databaseEndpointWorld);
-  //   }
-
-
   loadJsonFromRemote(databaseEndpointSwiss, function(data) {
-    //only try fallback once
-
     if(data !== 404){
-      // self.attacks = data;
-      // nullActors();
       dataSwiss = data;
       for(i=0; i<dataSwiss.length; i++){
           var e = dataSwiss[i];

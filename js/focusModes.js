@@ -44,8 +44,6 @@ const setPickability = function(meshes, status){
 
 const focusChange = function(focus){
 
-  console.log(focus);
-
   if(focus == "switzerland"){
     if(activeFocus != focus){
         console.log("change focus to Switzerland");
