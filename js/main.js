@@ -17,8 +17,8 @@ document.getElementById("buttonModeSwitzerland").onclick = function(){
 
 
 const canvas = document.getElementById("renderCanvas"); // Get the canvas element
-//disable left-click context menu for renderCanvas
-canvas.oncontextmenu = function() {
+
+canvas.oncontextmenu = function() { //disable left-click context menu for renderCanvas
   return false;
 }
 
@@ -90,14 +90,6 @@ var countryBordersMorph, swissBorderMorph;
 const mapRange = function (value, in_min, in_max, out_min, out_max) {
   return (value - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
-
-function positionTooltip(e) { // position tooltip relative to pointer
-    var x = e.clientX;
-    var y = e.clientY;
-    tooltip.style.left = x +10 + "px";
-    tooltip.style.top = y -10 + "px";
-}
-
 
 const createScene = function() { // create new BABYLON Scene, Scene Optimizer & Camera
 
@@ -560,9 +552,6 @@ const initializeScene = function(){
   }
 }
 
-
-
-
 const scene = createScene(); //Call the createScene function
 
 //trigger loading functinos --> Callbacks triggers initializeScene()
@@ -570,6 +559,12 @@ loadModels();
 loadData();
 runRenderLoop();
 
+function positionTooltip(e) { // position tooltip relative to pointer
+    var x = e.clientX;
+    var y = e.clientY;
+    tooltip.style.left = x +10 + "px";
+    tooltip.style.top = y -10 + "px";
+}
 
 
 
@@ -582,9 +577,9 @@ window.addEventListener("resize", function () {
 
 });
 
-// Debut Layer Shortcut
+// Debut Layer Shortcu  t
 document.addEventListener('keydown', function (event) {
-  // CTRL + S combo
+  // ctrl + alt + d shortcut
   if (event.ctrlKey && event.altKey && event.key === 'd' && debug == false) {
     scene.debugLayer.show({overlay: true});
     debug = true;
