@@ -32,6 +32,7 @@ const tooltip = document.getElementById("tooltip");
 var modelsLoaded = false;
 var dataWorld = null;
 var dataSwiss = null;
+var filteredDataSwiss = null;
 var debug = false;
 var edgeThickness = 0;
 
@@ -80,7 +81,7 @@ var lowerCameraLimitZ = -1;
 
 
 //global variables for 3D Objects
-var camera, nodeRoot, nodeCountryFills, nodeCantonFills, meshSwissBorder, meshCountryBorders, cameraAlpha, cameraBeta, floorPlane;
+var camera, nodeRoot, nodeCountryFills, nodeCantonFills, meshSwissBorder, meshCountryBorders, prefabIndicator, cameraAlpha, cameraBeta, floorPlane;
 
 // global variables for Morphs
 var countryBordersMorph, swissBorderMorph;
@@ -133,16 +134,21 @@ const loadModels = function(){ // Load gltf, populate global mesh variables, dis
       nodeCantonFills = scene.getNodeByName("cantonFillsIndividual");
       nodeCountryFills = scene.getNodeByName("countryFills");
       meshSwissBorder = scene.getMeshByName("swissBoarder");
-
+      meshLakes = scene.getMeshByName("lakes");
       meshCountryBorders = scene.getMeshByName("countryBoarders");
+      prefabIndicator = scene.getMeshByName("indicator");
 
       countryBordersMorph = meshCountryBorders.morphTargetManager.getTarget(0);
       swissBorderMorph = meshSwissBorder.morphTargetManager.getTarget(0);
+
+      prefabIndicator.setEnabled(false);
+      prefabIndicator.renderingGroupId = 1;
       //add floorPlane
       floorPlane = BABYLON.MeshBuilder.CreatePlane("FloorPlane", {height:10, width: 20}, scene);
       floorPlane.rotation.x = Math.PI/2;
       floorPlane.visibility = 0;
       floorPlane.position.y = -0.04;
+
 
       //Disable pickable on all meshes
       //
@@ -245,6 +251,7 @@ const loadData = function(){
             }
         }
         initializeScene();
+        initializeUI();
       });
     }
   });
@@ -539,17 +546,128 @@ const addRenderObservables = function(){ //Update Functions beforeRender & after
 });
 }
 
+const updateIndicators = function(){
+  filteredDataSwiss = dataSwiss;
+  var locations = ['AG','AR','AI','BL','BS','BE','FR','GE','GL','GR','JU','LU','NE','NW','OW','SG','SH','SZ','SO','TG','TI','UR','VD','VS','ZG','ZH'];
+
+  var filterByCanton = function(canton){
+    return filteredDataSwiss.filter(function(el) {
+      return el.canton.indexOf(canton) > -1;
+    })
+  }
+
+  for(i = 0; i<locations.length; i++){
+    var subset = filterByCanton(locations[i]); //get all attacks of one location
+    var parentNode = scene.getNodeByName("IndSwi_"+locations[i]); //get the parent Node
+    var presentIndicators = parentNode.getChildren();
+
+    if(presentIndicators < subset.length){//adding instances if needed
+      for(e = presentIndicators;  e < subset.length; e++){
+        var instance = prefabIndicator.createInstance(locations[i]+"_"+e);
+        instance.setParent(parentNode);
+        console.log("adding indicator");
+       }
+    }
+
+    var indicators = parentNode.getChildren();
+    for(e = 0; e < indicators.length; e++){
+      indicators[e].setPositionWithLocalVector(new BABYLON.Vector3(0, e*0.04+0.02 ,0));
+      indicators[e].isPickable  = false;
+      indicators[e].visibility = 1;
+    }
+  }
+}
+
+const updateTimeline = function(start, end){
+  var timeline = document.getElementById('timeline');
+
+
+  noUiSlider.create(timeline, {
+      start: [start, end],
+      step: 1,
+      behaviour: "drag-tap",
+      connect: true,
+      range: {
+          'min': start,
+          'max': end
+      }
+  });
+
+};
+
 const initializeScene = function(){
   if(modelsLoaded == true && dataSwiss && dataWorld){
 
     addPointerEvents();
     addRenderObservables();
+    updateIndicators();
     console.log("initialize scene");
+    console.log(dataSwiss);
+
   }
 
   else{
     console.log("can't initialize scene yet");
   }
+}
+
+const initializeUI = function(){
+  var firstAttackDate = dataSwiss[0].discoveryDate;
+  var today = new Date;
+  var attributions = [];
+  console.log(dataSwiss);
+
+
+  for(i = 0; i < dataSwiss.length; i++){
+    // get the earliest discoveryDate && all attributions
+    if(dataSwiss[i].discoveryDate < firstAttackDate){
+      firstAttackDate = dataSwiss[i].discoveryDate;
+    }
+    if(attributions.indexOf(dataSwiss[i].threatActor.country) == -1){
+      attributions.push(dataSwiss[i].threatActor.country);
+    }
+  }
+  attributions.sort();
+  console.log(attributions);
+
+  firstAttackDate = new Date(firstAttackDate);
+
+
+  var startMonth = firstAttackDate.getMonth();
+  var startYear = firstAttackDate.getFullYear();
+
+  var endMonth = today.getMonth();
+  var endYear = today.getFullYear();
+
+  var range = (12*(endYear-startYear))+ endMonth - startMonth;
+  updateTimeline(0,range);
+
+  var attributionList = document.getElementById("attributionList");
+  attributionList.innerHTML = "";
+
+  for(i = 0 ; i < attributions.length ;  i++){
+    var div = document.createElement("div");
+    div.className = "attributionButton";
+
+    attributionList.appendChild(div);
+
+    var label = document.createElement("label");
+    div.appendChild(label);
+
+    var input = document.createElement("input");
+    input.type = "checkbox";
+    input.checked = true;
+    input.value = attributions[i];
+    input.name = "attributionButtonSwitzerland";
+    label.appendChild(input);
+
+    var span = document.createElement("span");
+    span.innerHTML = attributions[i];
+    label.appendChild(span);
+
+  }
+
+
 }
 
 const scene = createScene(); //Call the createScene function
