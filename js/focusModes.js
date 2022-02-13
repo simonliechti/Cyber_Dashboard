@@ -10,7 +10,7 @@ const HOME_RADIUS = 7;
 const HOME_ALPHA = 0;
 const HOME_BETA = -Math.PI / 4;
 const HOME_TARGET = new BABYLON.Vector3(0,0,0);
-const BORDER_COLOR = new BABYLON.Color3(10/255, 10/255, 10/255);
+const BORDER_COLOR = new BABYLON.Color3(31/255, 38/255, 44/255);
 const BORDER_COLOR_DIMMED = new BABYLON.Color3(1/255, 1/255, 1/255);
 
 var panningDistanceLimitWorld = 2;
