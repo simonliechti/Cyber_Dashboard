@@ -547,7 +547,7 @@ const addRenderObservables = function(){ //Update Functions beforeRender & after
 }
 
 const updateIndicators = function(){
-  filteredDataSwiss = dataSwiss;
+
   var locations = ['AG','AR','AI','BL','BS','BE','FR','GE','GL','GR','JU','LU','NE','NW','OW','SG','SH','SZ','SO','TG','TI','UR','VD','VS','ZG','ZH'];
 
   var filterByCanton = function(canton){
@@ -561,11 +561,19 @@ const updateIndicators = function(){
     var parentNode = scene.getNodeByName("IndSwi_"+locations[i]); //get the parent Node
     var presentIndicators = parentNode.getChildren();
 
-    if(presentIndicators < subset.length){//adding instances if needed
-      for(e = presentIndicators;  e < subset.length; e++){
+    if(presentIndicators.length < subset.length){//adding instances if needed
+      for(e = presentIndicators.length;  e < subset.length; e++){
         var instance = prefabIndicator.createInstance(locations[i]+"_"+e);
         instance.setParent(parentNode);
-        console.log("adding indicator");
+        instance.scaling = new BABYLON.Vector3(.4,-.4,.4);
+       }
+    }
+    if(presentIndicators.length > subset.length){
+      console.log("removing indicators");
+      for(u = presentIndicators.length;  u > subset.length; u--){
+        var toRemove = parentNode.getChildren()[u-1];
+        toRemove.dispose();
+
        }
     }
 
@@ -578,13 +586,65 @@ const updateIndicators = function(){
   }
 }
 
-const updateTimeline = function(start, end){
-  var timeline = document.getElementById('timeline');
+const filterAttacks = function(){
 
+  var slider = document.getElementById('timelineSwitzerland');
+  var sliderPositions = slider.noUiSlider.get();
 
-  noUiSlider.create(timeline, {
+  var attributionButtonsSwitzerland = document.getElementsByName("attributionButtonSwitzerland");
+  var checkedAttributions = [];
+  filteredDataSwiss = [];
+
+  for (i = 0; i < attributionButtonsSwitzerland.length ; i++){
+    if(attributionButtonsSwitzerland[i].checked){
+      checkedAttributions.push(attributionButtonsSwitzerland[i].value);
+    }
+  }
+
+  var today = moment();
+
+  //creating maxDate&minDate by rounding up current Day to the next Month
+  var maxDate = moment(today.month()+1, "MM");
+  var minDate = moment(today.month()+1, "MM");
+  maxDate.add(1, 'months');
+  minDate.add(1, 'months');
+
+  minDate.add(sliderPositions[0], "months");
+  maxDate.add(sliderPositions[1], "months");
+  //var maxDate = maxDate.add(sliderPositions[1], "months");
+
+  // console.log(minDate.format("D, M, YYYY"));
+  // console.log(maxDate.format("D, M, YYYY"));
+
+  for ( i = 0; i < dataSwiss.length; i++ ){
+    var discoveryDate = moment(dataSwiss[i].discoveryDate);
+    var cleanupDate = moment(dataSwiss[i].cleanupDate);
+    var attribution = dataSwiss[i].threatActor.country
+
+    if(dataSwiss[i].cleanupDate == null){
+      cleanupDate = moment();
+    }
+
+    if(checkedAttributions.indexOf(attribution) === -1 || discoveryDate > maxDate || cleanupDate < minDate ){
+
+    }
+    else{
+      filteredDataSwiss.push(dataSwiss[i]);
+    }
+  }
+  updateIndicators();
+}
+
+const createSlider = function(start, end){
+
+  var slider = document.getElementById('timelineSwitzerland');
+
+  console.log("creating slider");
+
+  noUiSlider.create(slider, {
       start: [start, end],
       step: 1,
+      margin: 1,
       behaviour: "drag-tap",
       connect: true,
       range: {
@@ -593,6 +653,8 @@ const updateTimeline = function(start, end){
       }
   });
 
+  slider.noUiSlider.on('update', filterAttacks);
+
 };
 
 const initializeScene = function(){
@@ -600,7 +662,7 @@ const initializeScene = function(){
 
     addPointerEvents();
     addRenderObservables();
-    updateIndicators();
+    filterAttacks();
     console.log("initialize scene");
     console.log(dataSwiss);
 
@@ -612,11 +674,10 @@ const initializeScene = function(){
 }
 
 const initializeUI = function(){
+
   var firstAttackDate = dataSwiss[0].discoveryDate;
   var today = new Date;
   var attributions = [];
-  console.log(dataSwiss);
-
 
   for(i = 0; i < dataSwiss.length; i++){
     // get the earliest discoveryDate && all attributions
@@ -628,10 +689,8 @@ const initializeUI = function(){
     }
   }
   attributions.sort();
-  console.log(attributions);
 
   firstAttackDate = new Date(firstAttackDate);
-
 
   var startMonth = firstAttackDate.getMonth();
   var startYear = firstAttackDate.getFullYear();
@@ -639,17 +698,17 @@ const initializeUI = function(){
   var endMonth = today.getMonth();
   var endYear = today.getFullYear();
 
-  var range = (12*(endYear-startYear))+ endMonth - startMonth;
-  updateTimeline(0,range);
+  var range = (12*(endYear-startYear))+ endMonth - startMonth + 1;
+  createSlider(-range,0);
 
-  var attributionList = document.getElementById("attributionList");
-  attributionList.innerHTML = "";
+  var attributionListSwiss = document.getElementById("attributionListSwiss");
+  attributionListSwiss.innerHTML = "";
 
   for(i = 0 ; i < attributions.length ;  i++){
     var div = document.createElement("div");
     div.className = "attributionButton";
 
-    attributionList.appendChild(div);
+    attributionListSwiss.appendChild(div);
 
     var label = document.createElement("label");
     div.appendChild(label);
@@ -659,6 +718,7 @@ const initializeUI = function(){
     input.checked = true;
     input.value = attributions[i];
     input.name = "attributionButtonSwitzerland";
+    input.addEventListener("change", filterAttacks);
     label.appendChild(input);
 
     var span = document.createElement("span");

@@ -22,7 +22,7 @@ const scaleSwiss = new BABYLON.Vector3( 1.5 ,1.5 ,-1.5 );
 
 var activeFocus = "";
 
-const resetCamera = function(easingFunction){
+const resetCamera = function(){
 
   var easingFunction = new BABYLON.ExponentialEase(5);
   easingFunction.setEasingMode(BABYLON.EasingFunction.EASINGMODE_EASEOUT);
@@ -43,22 +43,33 @@ const setPickability = function(meshes, status){
 }
 
 const focusChange = function(focus){
+  var wrapperAttributionsSwizterland = document.getElementById('wrapperAttributionsSwizterland');
+  var wrapperTimeline = document.getElementById('wrapperTimeline');
 
   if(focus == "switzerland"){
     if(activeFocus != focus){
         console.log("change focus to Switzerland");
+        wrapperAttributionsSwizterland.style.transform = "translateX(0px)";
+        wrapperTimeline.style.transform = "translateY(0px)";
+
         setPickability(nodeCantonFills.getChildren(), true);
         setPickability(nodeCountryFills.getChildren(), false);
 
         var easingFunction = new BABYLON.QuadraticEase();
         easingFunction.setEasingMode(BABYLON.EasingFunction.EASINGMODE_EASEINOUT);
         BABYLON.Animation.CreateAndStartAnimation("anim_scale", root, "scaling", 60, TRANSITION_DURATION, root.scaling, scaleSwiss, 0, easingFunction);
+
         easingFunction = new BABYLON.CircleEase();
         easingFunction.setEasingMode(BABYLON.EasingFunction.EASINGMODE_EASEOUT);
         BABYLON.Animation.CreateAndStartAnimation("anim_color", meshCountryBorders, "material.emissiveColor", 60, TRANSITION_DURATION, meshCountryBorders.material.emissiveColor, BORDER_COLOR_DIMMED, 0, easingFunction);
+
         resetCamera();
-        camera.lowerRadiusLimit = 3;
+
+        camera.lowerRadiusLimit = 1;
         camera.upperRadiusLimit = 12;
+
+
+
         activeFocus = focus;
       }
   }
@@ -71,6 +82,7 @@ const focusChange = function(focus){
       var easingFunction = new BABYLON.ExponentialEase(10);
       easingFunction.setEasingMode(BABYLON.EasingFunction.EASINGMODE_EASEOUT);
       BABYLON.Animation.CreateAndStartAnimation("anim_scale", root, "scaling", 60, TRANSITION_DURATION, root.scaling, scaleWorld, 0, easingFunction);
+
       easingFunction = new BABYLON.ExponentialEase(20);
       easingFunction.setEasingMode(BABYLON.EasingFunction.EASINGMODE_EASEOUT);
       BABYLON.Animation.CreateAndStartAnimation("anim_color", meshCountryBorders, "material.emissiveColor", 60, TRANSITION_DURATION, meshCountryBorders.material.emissiveColor, BORDER_COLOR, 0, easingFunction);
@@ -82,12 +94,27 @@ const focusChange = function(focus){
 
   if(focus.indexOf("switzerland:") !== -1 ){
 
-    if(activeFocus != focus){
-      console.log("focusing on " + focus.slice(12));
+    var canton = focus.slice(12);
+    var indicatorNode = scene.getNodeByName("IndSwi_"+canton);
+    console.log(indicatorNode.getAbsolutePosition().x);
+
+    var position = new BABYLON.Vector3(indicatorNode.getAbsolutePosition().x, indicatorNode.getAbsolutePosition().y, indicatorNode.getAbsolutePosition().z -0.2 );
+    if(activeFocus != focus && indicatorNode.getChildren().length > 0){
+
+      wrapperAttributionsSwizterland.style.transform = "translateX(-200px)";
+      wrapperTimeline.style.transform = "translateY(100px)";
+
+      var easingFunction = new BABYLON.ExponentialEase(5);
+      easingFunction.setEasingMode(BABYLON.EasingFunction.EASINGMODE_EASEOUT);
+      BABYLON.Animation.CreateAndStartAnimation("anim_alpha", cameraAlpha, "rotation.y", 60, TRANSITION_DURATION, cameraAlpha.rotation.y, HOME_ALPHA, 0, easingFunction);
+      BABYLON.Animation.CreateAndStartAnimation("anim_beta", cameraBeta, "rotation.x", 60, TRANSITION_DURATION, cameraBeta.rotation.x, -.5, 0, easingFunction);
+      BABYLON.Animation.CreateAndStartAnimation("anim_radius", camera, "position.z", 60, TRANSITION_DURATION, camera.position.z, 2, 0, easingFunction);
+      BABYLON.Animation.CreateAndStartAnimation("anim_position", cameraAlpha, "position", 60, TRANSITION_DURATION, cameraAlpha.position, position, 0, easingFunction);
+
+
       activeFocus = focus;
       setPickability(nodeCantonFills.getChildren(), false);
       setPickability(nodeCountryFills.getChildren(), false);
-      //setPickability(floorPlane, false);
     }
 
   }

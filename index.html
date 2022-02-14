@@ -2,6 +2,7 @@
 <html>
 <head>
 <link rel="stylesheet" type="text/css" href="css/master.css">
+<link href="css\nouislider.css" type="text/css" rel="stylesheet">
 </head>
 
 <body>
@@ -14,22 +15,26 @@
 
   <div id="containerUI" >
     <div id="tooltip">Tooltip</div>
-    <div id='sidebar_left'>Sidebar Left
+
+    <div id='sidebar_left'>
       <div id= "logo">logo</div>
-      <div id= "filter">filter</div>
-      <div id= "attributionList">
-        <div class="attributionButton">
-           <label>
-              <input type="checkbox" value="Attribution 01" checked><span>Attribution 01</span>
-           </label>
+      <div class = "wrapperAttributionList" id = "wrapperAttributionsSwizterland">
+        <div class = "attributionList" id= "attributionListSwiss">
+          <div class="attributionButton">
+             <label>
+                <input type="checkbox" value="Attribution 01" checked><span>Attribution 01</span>
+             </label>
+          </div>
+          <div class="attributionButton">
+             <label>
+                <input type="checkbox" value="Attribution 02" checked><span>Attribution 02</span>
+             </label>
+          </div>
         </div>
-        <div class="attributionButton">
-           <label>
-              <input type="checkbox" value="Attribution 02" checked><span>Attribution 02</span>
-           </label>
+        <div class = "attributionList" id= "attributionListWorld">
         </div>
+        <div id= "attributionListButtons">All / None</div>
       </div>
-      <div id= "attributionListButtons">All / None</div>
     </div>
     <div id='header'>
       <div id="headerTitel">Cyber Threat Center</div>
@@ -42,16 +47,21 @@
     </div>
 
     <div id='sidebar_right'>Sidebar Right</div>
-    <div id='timeline'></div>
+    <div id = 'wrapperTimeline'>
+      <div id='timelineSwitzerland'>
+      </div>
+    </div>
   </div>
 
-  <script src="js\nouislider.js"></script>
-  <link href="css\nouislider.css" type="text/css" rel="stylesheet">
+
+
 
 
   <script src="https://cdn.babylonjs.com/babylon.js"></script>
+  <script src="js\nouislider.js"></script>
   <script src="js\focusModes.js"></script>
   <script src="https://cdn.babylonjs.com/loaders/babylonjs.loaders.js"></script>
+  <script src="js\moment.min.js"></script>
   <script src="js\main.js"></script>
 
 
