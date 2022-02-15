@@ -20,7 +20,19 @@ var panningDistanceLimitSwiss = 1;
 const scaleWorld = new BABYLON.Vector3( 0.02 ,0.02 ,-0.02 );
 const scaleSwiss = new BABYLON.Vector3( 1.5 ,1.5 ,-1.5 );
 
+
 var activeFocus = "";
+
+var wrapperAttributionsSwizterland = document.getElementById('wrapperAttributionsSwizterland');
+var wrapperAttributionsWorld = document.getElementById('wrapperAttributionsWorld');
+
+var wrapperAttackSelector = document.getElementById('wrapperAttackSelector');
+var wrapperAttackDetails = document.getElementById('wrapperAttackDetails');
+
+var sidebar_right = document.getElementById('sidebar_right');
+
+var wrapperTimeline = document.getElementById('wrapperTimeline');
+
 
 const resetCamera = function(){
 
@@ -43,14 +55,25 @@ const setPickability = function(meshes, status){
 }
 
 const focusChange = function(focus){
-  var wrapperAttributionsSwizterland = document.getElementById('wrapperAttributionsSwizterland');
-  var wrapperTimeline = document.getElementById('wrapperTimeline');
+
 
   if(focus == "switzerland"){
     if(activeFocus != focus){
-        console.log("change focus to Switzerland");
+
         wrapperAttributionsSwizterland.style.transform = "translateX(0px)";
+        wrapperAttributionsSwizterland.style.opacity = "1";
+
+        wrapperAttributionsWorld.style.transform = "translateX(-200px)";
+        wrapperAttributionsWorld.style.opacity = "0";
+
+        wrapperAttackSelector.style.opacity = "0";
+        wrapperAttackDetails.style.opacity = "0";
+
         wrapperTimeline.style.transform = "translateY(0px)";
+
+        sidebar_right.style.transform = "translateX(0px)";
+        sidebar_right.style.opacity = "1";
+
 
         setPickability(nodeCantonFills.getChildren(), true);
         setPickability(nodeCountryFills.getChildren(), false);
@@ -75,6 +98,22 @@ const focusChange = function(focus){
   }
   if(focus == "world"){
     if(activeFocus != focus){
+
+      wrapperAttributionsSwizterland.style.transform = "translateX(-200px)";
+      wrapperAttributionsSwizterland.style.opacity = "0";
+
+      wrapperAttributionsWorld.style.transform = "translateX(0)";
+      wrapperAttributionsWorld.style.opacity = "1";
+
+      wrapperAttackDetails.style.opacity = "0";
+      wrapperAttackSelector.style.opacity = "0";
+
+      wrapperTimeline.style.transform = "translateY(100px)";
+
+      sidebar_right.style.transform = "translateX(200px)";
+      sidebar_right.style.opacity = "0";
+
+
       console.log("change focus to World");
       setPickability(nodeCantonFills.getChildren(), false);
       setPickability(nodeCountryFills.getChildren(), true);
@@ -102,7 +141,15 @@ const focusChange = function(focus){
     if(activeFocus != focus && indicatorNode.getChildren().length > 0){
 
       wrapperAttributionsSwizterland.style.transform = "translateX(-200px)";
+      wrapperAttributionsSwizterland.style.opacity = "0";
+
+      wrapperAttackSelector.style.opacity = "1";
+      wrapperAttackDetails.style.opacity = "1";
+
       wrapperTimeline.style.transform = "translateY(100px)";
+
+      sidebar_right.style.transform = "translateX(200px)";
+      sidebar_right.style.opacity = "0";
 
       var easingFunction = new BABYLON.ExponentialEase(5);
       easingFunction.setEasingMode(BABYLON.EasingFunction.EASINGMODE_EASEOUT);

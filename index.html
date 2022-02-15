@@ -31,9 +31,44 @@
              </label>
           </div>
         </div>
-        <div class = "attributionList" id= "attributionListWorld">
+        <div id= "attributionListButtons">
+
+          <label for=buttonAll class="attributionButton narrow">
+            <input type=button  class="attributionInput" id=buttonAll >
+            <span>All</span>
+          </label>
+
+          <label for=buttonNone class="attributionButton narrow">
+            <input type=button  class="attributionInput" id=buttonNone >
+            <span>None</span>
+          </label>
+
         </div>
-        <div id= "attributionListButtons">All / None</div>
+      </div>
+      <div class = "wrapperAttributionList" id = "wrapperAttributionsWorld">
+        <div class = "attributionList" id= "attributionListWorld">
+          <label for=radio1 class="attributionButton">
+          <input type=radio name=attackers class="attributionInput" id=radio1 >
+          <span>Radio1</span>
+          </label>
+          <label for=radio2  class="attributionButton">
+            <input type=radio class="attributionInput" name=attackers id=radio2 >
+            <span>Radio2</span>
+          </label>
+        </div>
+        <div id= "attributionListButtons">
+
+          <label for=buttonAttackers class="attributionButton narrow">
+            <input type=radio  name=attackersvictims class="attributionInput" id=buttonAttackers checked>
+            <span>Attackers</span>
+          </label>
+
+          <label for=buttonVictims class="attributionButton narrow">
+            <input type=radio name=attackersvictims class="attributionInput" id=buttonVictims >
+            <span>Victims</span>
+          </label>
+
+        </div>
       </div>
     </div>
     <div id='header'>
@@ -51,6 +86,9 @@
       <div id='timelineSwitzerland'>
       </div>
     </div>
+
+    <div id = "wrapperAttackSelector">attack selector</div>
+    <div id = "wrapperAttackDetails">attack details</div>
   </div>
 
 

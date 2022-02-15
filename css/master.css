@@ -23,6 +23,27 @@ body {
   cursor: pointer;
 }
 
+#wrapperAttackSelector{
+  position: absolute;
+  height: 400px;
+  width: 400px;
+  background-color: hsla(210, 17%, 30%, .5);
+  visibility: visible;
+  left: calc(50vw - 600px);
+  top: calc(50vh - 200px);
+  transition: opacity 500ms;
+}
+
+#wrapperAttackDetails{
+  position: absolute;
+  height: 600px;
+  width: 600px;
+  background-color: hsla(210, 17%, 30%, .5);
+  visibility: visible;
+  left: calc(50vw + 200px );
+  top: calc(50vh - 300px );
+  transition: opacity 500ms;
+}
 
 #backdrop {
   position: absolute;
@@ -31,7 +52,6 @@ body {
   /* background-image: radial-gradient(circle farthest-side, hsl(210, 17%, 0%) ,hsl(210, 17%, 8%)); */
   background-image: radial-gradient(hsl(210, 17%, 8%) ,hsl(210, 17%, 0%));
   z-index: -2;
-
 }
 
 #renderCanvas {
@@ -129,17 +149,19 @@ body {
 }
 
 .wrapperAttributionList{
-  position: relative;
+  position: absolute;
   top:200px;
 }
 
 .attributionList{
   pointer-events: visible;
-  position: absolute;
+  position: relative;
   margin:10px;
   margin-top: 30px;
+  padding-top: 10px;
+  padding-bottom: 10px;
   width:180px;
-  height: calc(100vh - 340px);
+  max-height: calc(100vh - 340px);
   background-color: hsla(210, 17%, 30%, .3);
   overflow-x: hidden;
   overflow-y: auto;
@@ -149,20 +171,30 @@ body {
 
 #wrapperAttributionsSwizterland{
   opacity: 1;
-  transition: transform 1s;
+  transition: transform 1s, opacity 500ms;
+  transform: translateX( 0px );
 }
 
+#wrapperAttributionsWorld{
+  opacity: 1;
+  transition: transform 1s, opacity 500ms;
+  transform: translateX( -200px );
+}
+
+
 #attributionListButtons{
-  position: absolute;
+  pointer-events: auto;
+  position: relative;
   margin-left:10px;
   margin-top: 10px;
-  top: calc(100vh - 300px);
+  padding-bottom: 10px;
+  /* top: calc(100vh - 300px); */
   width:180px;
   background-color: hsla(210, 17%, 30%, .3);
 }
 
 #attributionListWorld{
-  visibility: hidden;
+
 }
 #sidebar_right {
   color: white;
@@ -175,7 +207,8 @@ body {
   visibility: visible;
 
   background-color: hsla(210, 17%, 30%, 0.2);
-  font-weight: 100;
+  transition: transform 1s, opacity 500ms;
+
 }
 
 #header {
@@ -206,12 +239,33 @@ body {
 
 }
 
+
+
+
+.attributionInput{
+  color: grey;
+  visibility: collapse;
+  position: absolute;
+}
+
+.attributionInput span {
+    text-align:center;
+    padding:5px 0px;
+    display:block;
+    width: 180px;
+}
+
+
 .attributionButton {
+  width: 160px;
   display: inline-block;
-  pointer-events: auto;
   background-color:hsla(210, 17%, 30%, .3);
   overflow: visible;
   margin-top: 10px;
+}
+
+.attributionButton.narrow {
+  width: 75px;
 }
 
 .attributionButton:hover {
@@ -224,10 +278,14 @@ body {
   width:160px;
 }
 
-.attributionButton label span {
+.attributionButton span {
     text-align:center;
     padding:5px 0px;
     display:block;
+    color: grey;
+    user-select: none;
+    -ms-user-select: none;
+    cursor: default;
 }
 
 .attributionButton label input {

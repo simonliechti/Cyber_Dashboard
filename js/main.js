@@ -15,6 +15,33 @@ document.getElementById("buttonModeSwitzerland").onclick = function(){
   focusChange("switzerland");
 };
 
+document.getElementById("buttonAttackers").onclick = function(){
+  updateWorldAttributions("attackers");
+};
+
+document.getElementById("buttonVictims").onclick = function(){
+  updateWorldAttributions("victims");
+};
+
+document.getElementById("buttonAll").onclick = function(){
+  var buttons = document.getElementsByName("attributionButtonSwitzerland");
+
+  for(i = 0; i<buttons.length; i++){
+    buttons[i].checked = true;
+  }
+  filterAttacks();
+  console.log(dataSwiss);
+};
+
+document.getElementById("buttonNone").onclick = function(){
+  var buttons = document.getElementsByName("attributionButtonSwitzerland");
+
+  for(i = 0; i<buttons.length; i++){
+    buttons[i].checked = false;
+  }
+  filterAttacks();
+};
+
 
 const canvas = document.getElementById("renderCanvas"); // Get the canvas element
 
@@ -79,6 +106,7 @@ var lowerCameraLimitX = -1;
 var upperCameraLimitZ = 1;
 var lowerCameraLimitZ = -1;
 
+var cantons = ['AG','AR','AI','BL','BS','BE','FR','GE','GL','GR','JU','LU','NE','NW','OW','SG','SH','SZ','SO','TG','TI','UR','VD','VS','ZG','ZH'];
 
 //global variables for 3D Objects
 var camera, nodeRoot, nodeCountryFills, nodeCantonFills, meshSwissBorder, meshCountryBorders, prefabIndicator, cameraAlpha, cameraBeta, floorPlane;
@@ -251,7 +279,6 @@ const loadData = function(){
             }
         }
         initializeScene();
-        initializeUI();
       });
     }
   });
@@ -312,7 +339,6 @@ const addPointerEvents = function(){ //PointerEvents for all user Interaction wi
         floorPlane.isPickable = true;
         var hit = scene.pick(event.clientX, event.clientY)
         floorPlane.isPickable = false;
-        //console.log(hit);
         oldRadius = camera.position.z;
         oldAlphaPos.x = cameraAlpha.position.x;
         oldAlphaPos.z = cameraAlpha.position.z;
@@ -488,10 +514,8 @@ const highlightHovered = function(pointerInfo){ // hightlighting hovered mesh an
 
     if(hoveredObject != lastHoveredObject){
       if(lastHoveredObject){
-        //console.log("left "+ lastHoveredObject.name);
         lastHoveredObject.visibility = baseFillVisibility;
       }
-        //console.log("hovering "+ hoveredObject.name);
         hoveredObject.visibility = .5;
     }
 
@@ -546,43 +570,45 @@ const addRenderObservables = function(){ //Update Functions beforeRender & after
 });
 }
 
+const filterByCanton = function(canton){
+  return filteredDataSwiss.filter(function(el) {
+    return el.canton.indexOf(canton) > -1;
+  })
+}
+
 const updateIndicators = function(){
+  for(i = 0; i<cantons.length; i++){
+    var subset = filterByCanton(cantons[i]); //get all attacks of one location
+    var parentNode = scene.getNodeByName("IndSwi_"+cantons[i]); //get the parent Node
 
-  var locations = ['AG','AR','AI','BL','BS','BE','FR','GE','GL','GR','JU','LU','NE','NW','OW','SG','SH','SZ','SO','TG','TI','UR','VD','VS','ZG','ZH'];
+    if(parentNode){
+      var presentIndicators = parentNode.getChildren();
 
-  var filterByCanton = function(canton){
-    return filteredDataSwiss.filter(function(el) {
-      return el.canton.indexOf(canton) > -1;
-    })
-  }
+      if(presentIndicators.length < subset.length){//adding instances if needed
+        for(e = presentIndicators.length;  e < subset.length; e++){
+          var instance = prefabIndicator.createInstance(cantons[i]+"_"+e);
+          instance.setParent(parentNode);
+          instance.scaling = new BABYLON.Vector3(.4,-.4,.4);
+         }
+      }
+      if(presentIndicators.length > subset.length){
+        for(u = presentIndicators.length;  u > subset.length; u--){
+          var toRemove = parentNode.getChildren()[u-1];
+          toRemove.dispose();
 
-  for(i = 0; i<locations.length; i++){
-    var subset = filterByCanton(locations[i]); //get all attacks of one location
-    var parentNode = scene.getNodeByName("IndSwi_"+locations[i]); //get the parent Node
-    var presentIndicators = parentNode.getChildren();
+         }
+      }
 
-    if(presentIndicators.length < subset.length){//adding instances if needed
-      for(e = presentIndicators.length;  e < subset.length; e++){
-        var instance = prefabIndicator.createInstance(locations[i]+"_"+e);
-        instance.setParent(parentNode);
-        instance.scaling = new BABYLON.Vector3(.4,-.4,.4);
-       }
+      var indicators = parentNode.getChildren();
+      for(e = 0; e < indicators.length; e++){
+        indicators[e].setPositionWithLocalVector(new BABYLON.Vector3(0, e*0.04+0.02 ,0));
+        indicators[e].isPickable  = false;
+        indicators[e].visibility = 1;
+      }
     }
-    if(presentIndicators.length > subset.length){
-      console.log("removing indicators");
-      for(u = presentIndicators.length;  u > subset.length; u--){
-        var toRemove = parentNode.getChildren()[u-1];
-        toRemove.dispose();
 
-       }
-    }
 
-    var indicators = parentNode.getChildren();
-    for(e = 0; e < indicators.length; e++){
-      indicators[e].setPositionWithLocalVector(new BABYLON.Vector3(0, e*0.04+0.02 ,0));
-      indicators[e].isPickable  = false;
-      indicators[e].visibility = 1;
-    }
+
   }
 }
 
@@ -613,8 +639,6 @@ const filterAttacks = function(){
   maxDate.add(sliderPositions[1], "months");
   //var maxDate = maxDate.add(sliderPositions[1], "months");
 
-  // console.log(minDate.format("D, M, YYYY"));
-  // console.log(maxDate.format("D, M, YYYY"));
 
   for ( i = 0; i < dataSwiss.length; i++ ){
     var discoveryDate = moment(dataSwiss[i].discoveryDate);
@@ -625,8 +649,8 @@ const filterAttacks = function(){
       cleanupDate = moment();
     }
 
-    if(checkedAttributions.indexOf(attribution) === -1 || discoveryDate > maxDate || cleanupDate < minDate ){
-
+    if(checkedAttributions.indexOf(attribution) === -1 || discoveryDate > maxDate || cleanupDate < minDate || !dataSwiss[i].canton ){
+      //do nothing
     }
     else{
       filteredDataSwiss.push(dataSwiss[i]);
@@ -662,6 +686,7 @@ const initializeScene = function(){
 
     addPointerEvents();
     addRenderObservables();
+    initializeUI();
     filterAttacks();
     console.log("initialize scene");
     console.log(dataSwiss);
@@ -701,24 +726,77 @@ const initializeUI = function(){
   var range = (12*(endYear-startYear))+ endMonth - startMonth + 1;
   createSlider(-range,0);
 
+
+
+
   var attributionListSwiss = document.getElementById("attributionListSwiss");
   attributionListSwiss.innerHTML = "";
 
   for(i = 0 ; i < attributions.length ;  i++){
-    var div = document.createElement("div");
-    div.className = "attributionButton";
-
-    attributionListSwiss.appendChild(div);
 
     var label = document.createElement("label");
-    div.appendChild(label);
+    label.className = "attributionButton";
+    attributionListSwiss.appendChild(label);
+
 
     var input = document.createElement("input");
     input.type = "checkbox";
+    input.className = "attributionInput";
     input.checked = true;
     input.value = attributions[i];
     input.name = "attributionButtonSwitzerland";
     input.addEventListener("change", filterAttacks);
+
+    label.appendChild(input);
+
+    var span = document.createElement("span");
+    span.innerHTML = attributions[i];
+    label.appendChild(span);
+  }
+
+  updateWorldAttributions("attackers");
+
+}
+
+const updateWorldAttributions = function(mode){
+  var attributionListWorld = document.getElementById("attributionListWorld");
+  var attributions = [];
+  console.log(dataWorld);
+
+  if(mode == "attackers"){
+    for(i = 0; i < dataWorld.attackers.length; i++){
+      if(attributions.indexOf(dataWorld.attackers[i].country) == -1){
+        attributions.push(dataWorld.attackers[i].country);
+      }
+    }
+  }
+
+  if(mode == "victims"){
+    for(i = 0; i < dataWorld.victims.length; i++){
+      if(attributions.indexOf(dataWorld.victims[i].country) == -1){
+        attributions.push(dataWorld.victims[i].country);
+      }
+    }
+  }
+
+  attributions.sort();
+
+  attributionListWorld.innerHTML = "";
+
+  for(i = 0; i < attributions.length; i++){
+
+    var label = document.createElement("label");
+    label.className = "attributionButton";
+    attributionListWorld.appendChild(label);
+
+
+    var input = document.createElement("input");
+    input.type = "radio";
+    input.className = "attributionInput";
+    input.value = attributions[i];
+    input.name = "attributionButtonWorld";
+    //input.addEventListener("change", filterAttacks);
+
     label.appendChild(input);
 
     var span = document.createElement("span");
@@ -726,8 +804,6 @@ const initializeUI = function(){
     label.appendChild(span);
 
   }
-
-
 }
 
 const scene = createScene(); //Call the createScene function
@@ -755,7 +831,9 @@ window.addEventListener("resize", function () {
 
 });
 
-// Debut Layer Shortcu  t
+
+
+// Debut Layer Shortcut
 document.addEventListener('keydown', function (event) {
   // ctrl + alt + d shortcut
   if (event.ctrlKey && event.altKey && event.key === 'd' && debug == false) {
