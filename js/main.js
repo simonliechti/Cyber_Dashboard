@@ -6,6 +6,11 @@ www.simonliechti.com
 */
 
 
+cssVars({
+  rootElement: document, // default
+  onlyLegacy: false
+});
+
 
 document.getElementById("buttonModeWorld").onclick = function(){
   focusChange("world");
@@ -54,6 +59,23 @@ const engine = new BABYLON.Engine(canvas, true, { stencil: true });
 engine.setHardwareScalingLevel(1 / window.devicePixelRatio);
 
 const tooltip = document.getElementById("tooltip");
+
+const chronologyDateInfection = document.getElementById("chronologyDateInfection");
+const chronologyDateDiscovery = document.getElementById("chronologyDateDiscovery");
+const chronologyDateCleanup = document.getElementById("chronologyDateCleanup");
+
+const threatActorName = document.getElementById("threatActorName");
+const threatActorAliases = document.getElementById("threatActorAliases");
+const threatActorCountry = document.getElementById("threatActorCountry");
+const threatActorDescription = document.getElementById("threatActorDescription");
+
+const victimName = document.getElementById("victimName");
+const victimLocation = document.getElementById("victimLocation");
+const victimSectors = document.getElementById("victimSectors");
+
+const attackInfoDetail = document.getElementById("attackInfoDetail");
+const attackDamage = document.getElementById("attackDamage");
+
 
 //global variables
 var modelsLoaded = false;
@@ -657,6 +679,7 @@ const filterAttacks = function(){
     }
   }
   updateIndicators();
+  updateStatistics();
 }
 
 const createSlider = function(start, end){
@@ -675,6 +698,8 @@ const createSlider = function(start, end){
           'min': start,
           'max': end
       }
+
+
   });
 
   slider.noUiSlider.on('update', filterAttacks);
@@ -755,6 +780,7 @@ const initializeUI = function(){
   }
 
   updateWorldAttributions("attackers");
+  evaluateStatisticsOverall();
 
 }
 
@@ -804,6 +830,66 @@ const updateWorldAttributions = function(mode){
     label.appendChild(span);
 
   }
+}
+
+
+const updateAttackInfosContent = function(id){
+
+
+  var selectedAttack = filteredDataSwiss.filter(function(el) {
+    return el.id == id; // Filter out the appropriate one
+  })
+  console.log(selectedAttack[0]);
+
+  var aliases = "";
+  var sectors = "";
+
+  for(i = 0; i < selectedAttack[0].threatActor.aliases.length; i++){
+    aliases = aliases + selectedAttack[0].threatActor.aliases[i].name + " / ";
+  }
+
+  for(i = 0; i < selectedAttack[0].sectors.length; i++){
+    sectors = sectors + selectedAttack[0].sectors[i].name + " / ";
+  }
+
+  aliases = aliases.slice(0, -3);
+  if(aliases){
+    aliases = "aka "+ aliases;
+  }
+
+  sectors = sectors.slice(0, -3);
+
+
+
+  if(selectedAttack[0].infectionDate){
+    chronologyDateInfection.innerHTML = moment(selectedAttack[0].infectionDate).format("DD-MM-YYYY");
+  }
+  else{
+    chronologyDateInfection.innerHTML = "unkown";
+  }
+
+  if(selectedAttack[0].cleanupDate){
+    chronologyDateCleanup.innerHTML = moment(selectedAttack[0].cleanupDate).format("DD-MM-YYYY");
+  }
+  else{
+    chronologyDateCleanup.innerHTML = "ongoing";
+  }
+
+  chronologyDateDiscovery.innerHTML = moment(selectedAttack[0].discoveryDate).format("DD-MM-YYYY");
+
+  threatActorName.innerHTML = selectedAttack[0].threatActor.name;
+  threatActorAliases.innerHTML = aliases;
+  threatActorCountry.innerHTML = selectedAttack[0].threatActor.country;
+  threatActorDescription.innerHTML = selectedAttack[0].threatActor.campaignDescription;
+
+  victimName.innerHTML = selectedAttack[0].company;
+  victimLocation.innerHTML = selectedAttack[0].city;
+  victimSectors.innerHTML = sectors;
+
+  attackInfoDetail.innerHTML = selectedAttack[0].caseDescription;
+  attackDamage.innerHTML = selectedAttack[0].damage;
+
+
 }
 
 const scene = createScene(); //Call the createScene function

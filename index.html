@@ -3,6 +3,7 @@
 <head>
 <link rel="stylesheet" type="text/css" href="css/master.css">
 <link href="css\nouislider.css" type="text/css" rel="stylesheet">
+<link href="css\simple-scrollbar.css" type="text/css" rel="stylesheet">
 </head>
 
 <body>
@@ -16,21 +17,26 @@
   <div id="containerUI" >
     <div id="tooltip">Tooltip</div>
 
+    <!-- Sidebar Left -->
+
     <div id='sidebar_left'>
-      <div id= "logo">logo</div>
-      <div class = "wrapperAttributionList" id = "wrapperAttributionsSwizterland">
-        <div class = "attributionList" id= "attributionListSwiss">
-          <div class="attributionButton">
-             <label>
-                <input type="checkbox" value="Attribution 01" checked><span>Attribution 01</span>
-             </label>
+      <div id= "logo"></div>
+
+      <!-- attributionListSwitzterland -->
+
+
+      <div class = "wrapperAttributionSelector" id = "wrapperAttributionsSwizterland">
+          <div  class = "wrapperAttributionList">
+            <div ss-container id = attributionScroll>
+              <div   id = "attributionListSwiss" >
+                <div class = "attackSelector">Attack1</div>
+                <div class = "attackSelector">Attack2</div>
+                <div class = "attackSelector">Attack3</div>
+                <div class = "attackSelector">Attack4</div>
+              </div>
+            </div>
           </div>
-          <div class="attributionButton">
-             <label>
-                <input type="checkbox" value="Attribution 02" checked><span>Attribution 02</span>
-             </label>
-          </div>
-        </div>
+
         <div id= "attributionListButtons">
 
           <label for=buttonAll class="attributionButton narrow">
@@ -45,16 +51,15 @@
 
         </div>
       </div>
-      <div class = "wrapperAttributionList" id = "wrapperAttributionsWorld">
-        <div class = "attributionList" id= "attributionListWorld">
-          <label for=radio1 class="attributionButton">
-          <input type=radio name=attackers class="attributionInput" id=radio1 >
-          <span>Radio1</span>
-          </label>
-          <label for=radio2  class="attributionButton">
-            <input type=radio class="attributionInput" name=attackers id=radio2 >
-            <span>Radio2</span>
-          </label>
+
+      <!-- attributionListWorld -->
+
+      <div class = "wrapperAttributionSelector" id = "wrapperAttributionsWorld">
+        <div class = "wrapperAttributionList">
+          <div ss-container id = attributionScroll>
+            <div   id = "attributionListWorld" >
+            </div>
+          </div>
         </div>
         <div id= "attributionListButtons">
 
@@ -71,6 +76,10 @@
         </div>
       </div>
     </div>
+
+    <!-- header -->
+
+
     <div id='header'>
       <div id="headerTitel">Cyber Threat Center</div>
       <div id="modeSelection_Wrapper">
@@ -81,14 +90,264 @@
        </div>
     </div>
 
-    <div id='sidebar_right'>Sidebar Right</div>
+    <!-- statistics -->
+
+    <div  id='sidebar_right'>
+        <div id = "statistics">
+          <div class = "sidebarTitle">Statistics</div>
+          <div class = "statisticsSubtitle">Selection</div>
+          <div class = "statisticsGroup">
+            <div class = "statisticsGroupName">- Origin -</div>
+            <div class = "statisticsSubGroup">
+              <div id = "originName1" class = "statisticsSubGroupName">Name</div>
+              <div id = "originValue1" class = "statisticsSubGroupValue">Value</div>
+              <div id = "originBar1" class = "statisticsSubGroupBar"></div>
+              <div class = "statisticsSubGroupBarFill"></div>
+            </div>
+            <div class = "statisticsSubGroup">
+              <div id = "originName2" class = "statisticsSubGroupName">Name</div>
+              <div id = "originValue2" class = "statisticsSubGroupValue">Value</div>
+              <div id = "originBar2" class = "statisticsSubGroupBar"></div>
+              <div class = "statisticsSubGroupBarFill"></div>
+            </div>
+            <div class = "statisticsSubGroup">
+              <div id ="originName3" class = "statisticsSubGroupName">Name</div>
+              <div id = "originValue3" class = "statisticsSubGroupValue">Value</div>
+              <div id = "originBar3" class = "statisticsSubGroupBar"></div>
+              <div class = "statisticsSubGroupBarFill"></div>
+            </div>
+            <div class = "statisticsSubGroup">
+              <div id ="originName4" class = "statisticsSubGroupName">Name</div>
+              <div id = "originValue4" class = "statisticsSubGroupValue">Value</div>
+              <div id = "originBar4" class = "statisticsSubGroupBar"></div>
+              <div class = "statisticsSubGroupBarFill"></div>
+            </div>
+            <div class = "statisticsSubGroup">
+              <div id ="originName5" class = "statisticsSubGroupName">Name</div>
+              <div id = "originValue5" class = "statisticsSubGroupValue">Value</div>
+              <div id = "originBar5" class = "statisticsSubGroupBar"></div>
+              <div class = "statisticsSubGroupBarFill"></div>
+            </div>
+          </div>
+          <div class = "statisticsGroup">
+            <div class = "statisticsGroupName">- Motive -</div>
+            <div class = "statisticsSubGroup">
+              <div id = "motiveName1" class = "statisticsSubGroupName">Name</div>
+              <div id = "motiveValue1" class = "statisticsSubGroupValue">Value</div>
+              <div id = "motiveBar1" class = "statisticsSubGroupBar"></div>
+              <div class = "statisticsSubGroupBarFill"></div>
+            </div>
+            <div class = "statisticsSubGroup">
+              <div id = "motiveName2" class = "statisticsSubGroupName">Name</div>
+              <div id = "motiveValue2" class = "statisticsSubGroupValue">Value</div>
+              <div id = "motiveBar2" class = "statisticsSubGroupBar"></div>
+              <div class = "statisticsSubGroupBarFill"></div>
+            </div>
+            <div class = "statisticsSubGroup">
+              <div id = "motiveName3" class = "statisticsSubGroupName">Name</div>
+              <div id = "motiveValue3" class = "statisticsSubGroupValue">Value</div>
+              <div id = "motiveBar3" class = "statisticsSubGroupBar"></div>
+              <div class = "statisticsSubGroupBarFill"></div>
+            </div>
+            <div class = "statisticsSubGroup">
+              <div id = "motiveName4" class = "statisticsSubGroupName">Name</div>
+              <div id = "motiveValue4" class = "statisticsSubGroupValue">Value</div>
+              <div id = "motiveBar4" class = "statisticsSubGroupBar"></div>
+              <div class = "statisticsSubGroupBarFill"></div>
+            </div>
+            <div class = "statisticsSubGroup">
+              <div id = "motiveName5" class = "statisticsSubGroupName">Name</div>
+              <div id = "motiveValue5" class = "statisticsSubGroupValue">Value</div>
+              <div id = "motiveBar5" class = "statisticsSubGroupBar"></div>
+              <div class = "statisticsSubGroupBarFill"></div>
+            </div>
+          </div>
+          <div class = "statisticsGroup">
+            <div class = "statisticsGroupName">- Sector -</div>
+            <div class = "statisticsSubGroup">
+              <div id = "sectorName1" class = "statisticsSubGroupName">Name</div>
+              <div id = "sectorValue1" class = "statisticsSubGroupValue">Value</div>
+              <div id = "sectorBar1" class = "statisticsSubGroupBar"></div>
+              <div class = "statisticsSubGroupBarFill"></div>
+            </div>
+            <div class = "statisticsSubGroup">
+              <div id = "sectorName2" class = "statisticsSubGroupName">Name</div>
+              <div id = "sectorValue2" class = "statisticsSubGroupValue">Value</div>
+              <div id = "sectorBar2" class = "statisticsSubGroupBar"></div>
+              <div class = "statisticsSubGroupBarFill"></div>
+            </div>
+            <div class = "statisticsSubGroup">
+              <div id = "sectorName3" class = "statisticsSubGroupName">Name</div>
+              <div id = "sectorValue3" class = "statisticsSubGroupValue">Value</div>
+              <div id = "sectorBar3" class = "statisticsSubGroupBar"></div>
+              <div class = "statisticsSubGroupBarFill"></div>
+            </div>
+            <div class = "statisticsSubGroup">
+              <div id = "sectorName4" class = "statisticsSubGroupName">Name</div>
+              <div id = "sectorValue4" class = "statisticsSubGroupValue">Value</div>
+              <div id = "sectorBar4" class = "statisticsSubGroupBar"></div>
+              <div class = "statisticsSubGroupBarFill"></div>
+            </div>
+            <div class = "statisticsSubGroup">
+              <div id = "sectorName5" class = "statisticsSubGroupName">Name</div>
+              <div id = "sectorValue5" class = "statisticsSubGroupValue">Value</div>
+              <div id = "sectorBar5" class = "statisticsSubGroupBar"></div>
+              <div class = "statisticsSubGroupBarFill"></div>
+            </div>
+          </div>
+          <div class = "statisticsGroup">
+            <div class = "statisticsGroupName">- Threat Actors -</div>
+            <div class = "statisticsSubGroup">
+              <div id = "actorName1" class = "statisticsSubGroupName">Name</div>
+              <div id = "actorValue1" class = "statisticsSubGroupValue">Value</div>
+              <div id = "actorBar1" class = "statisticsSubGroupBar"></div>
+              <div class = "statisticsSubGroupBarFill"></div>
+            </div>
+            <div class = "statisticsSubGroup">
+              <div id = "actorName2" class = "statisticsSubGroupName">Name</div>
+              <div id = "actorValue2" class = "statisticsSubGroupValue">Value</div>
+              <div id = "actorBar2" class = "statisticsSubGroupBar"></div>
+              <div class = "statisticsSubGroupBarFill"></div>
+            </div>
+            <div class = "statisticsSubGroup">
+              <div id = "actorName3" class = "statisticsSubGroupName">Name</div>
+              <div id = "actorValue3" class = "statisticsSubGroupValue">Value</div>
+              <div id = "actorBar3" class = "statisticsSubGroupBar"></div>
+              <div class = "statisticsSubGroupBarFill"></div>
+            </div>
+            <div class = "statisticsSubGroup">
+              <div id = "actorName4" class = "statisticsSubGroupName">Name</div>
+              <div id = "actorValue4" class = "statisticsSubGroupValue">Value</div>
+              <div id = "actorBar4" class = "statisticsSubGroupBar"></div>
+              <div class = "statisticsSubGroupBarFill"></div>
+            </div>
+            <div class = "statisticsSubGroup">
+              <div id = "actorName5" class = "statisticsSubGroupName">Name</div>
+              <div id = "actorValue5" class = "statisticsSubGroupValue">Value</div>
+              <div id = "actorBar5" class = "statisticsSubGroupBar"></div>
+              <div class = "statisticsSubGroupBarFill"></div>
+            </div>
+          </div>
+          <div class = "statisticsSubtitle">Overall</div>
+          <div class = "statisticsGroup">
+            <div class = "statisticsSubGroup">
+              <div class = "statisticsSubGroupName">Threat Actors</div>
+              <div id = "overallActorsValue" class = "statisticsSubGroupValue">Value</div>
+              <div class = "statisticsSubGroupBar"></div>
+              <div class = "statisticsSubGroupBarFill"></div>
+            </div>
+            <div class = "statisticsSubGroup">
+              <div class = "statisticsSubGroupName">Victims</div>
+              <div id = "overallVictimsValue" class = "statisticsSubGroupValue">Value</div>
+              <div class = "statisticsSubGroupBar"></div>
+              <div class = "statisticsSubGroupBarFill"></div>
+            </div>
+            <div class = "statisticsSubGroup">
+              <div class = "statisticsSubGroupName">Ongoing Attacks</div>
+              <div id = "overallOngoingValues" class = "statisticsSubGroupValue">Value</div>
+              <div class = "statisticsSubGroupBar"></div>
+              <div class = "statisticsSubGroupBarFill"></div>
+            </div>
+          </div>
+        </div>
+    </div>
+
+    <!-- Timeline -->
+
     <div id = 'wrapperTimeline'>
       <div id='timelineSwitzerland'>
       </div>
     </div>
 
-    <div id = "wrapperAttackSelector">attack selector</div>
-    <div id = "wrapperAttackDetails">attack details</div>
+
+    <!-- popup switzerland -->
+
+    <div id= "wrapperPopupSwizterland">
+      <div id = "wrapperAttackSelector">
+        <div ss-container id = attackSelectorScroll>
+          <div id = attackSelectorContent>
+            <!--
+
+            <label class="attackButton">
+            <input type=radio name=attacks class="attackInput" value="testValue" id=radio1 >
+            <span>
+              <div class = attackButtonLabels style="text-align: center" >Origin:</div>
+              <div class = attackButtonContent >Origin Country</div>
+              <div class = attackButtonLabels style="text-align: center" >Victim:</div>
+              <div class = attackButtonContent >Victim Name</div>
+              <div class = attackButtonLabels style="text-align: center" >Actor:</div>
+              <div class = attackButtonContent >Actor Name</div></span></label>
+
+            <label class="attackButton">
+            <input type=radio name=attacks class="attackInput" value="testValue" id=radio1 >
+            <span>
+              <div class = attackButtonLabels style="text-align: center" >Origin:</div>
+              <div class = attackButtonContent >Origin Country</div>
+              <div class = attackButtonLabels style="text-align: center" >Victim:</div>
+              <div class = attackButtonContent >Victim Name</div>
+              <div class = attackButtonLabels style="text-align: center" >Actor:</div>
+              <div class = attackButtonContent >Actor Name</div></span></label>
+
+             -->
+          </div>
+        </div>
+      </div>
+      <div id = "attackInfosWrapper" >
+
+          <div id="attackInfosContent">
+            <div class = "infoSubtitle">- Chronology -</div>
+            <div id = "attackChronologyWrapper">
+              <div class = "dateBlock">
+                <div class = "chronologyStaticText">Infection Date</div>
+                <div id = "chronologyDateInfection">unknown</div>
+              </div>
+              <div class = "dateConnector"></div>
+              <div class = "dateBlock">
+                <div class = "chronologyStaticText">Discovery Date</div>
+                <div id = "chronologyDateDiscovery">Some Date</div>
+              </div>
+              <div class = "dateConnector"></div>
+              <div class = "dateBlock">
+                <div class = "chronologyStaticText">Cleanup Date</div>
+                <div id = "chronologyDateCleanup">ongoing</div>
+              </div>
+            </div>
+            <div class = "infoSubtitle">- Threat Actor -</div>
+            <div id = "attackActorWrapper">
+              <div id = "threatActorName">Threat Actor Name</div>
+              <div class = "floatingText" id = "threatActorAliases">aka Alias1 / Alias2 / Alias3</div>
+              <div class = "flexBreak"></div>
+              <div class = "infoStaticText">Origin: </div>
+              <div id = "threatActorCountry">Country Name</div>
+              <div class = "flexBreak"></div>
+              <div class = "infoStaticText">Motivation:</div>
+              <div id = "threatActorMotivation">Motivation1 / Motivation2</div>
+              <div class = "flexBreak"></div>
+              <div class = "floatingText" id ="threatActorDescription"> Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</div>
+
+            </div>
+            <div class = "infoSubtitle">- Victim -</div>
+            <div id = "attackVictimWrapper">
+              <div id = "victimName">Victim Name</div>
+              <div id = "victimLocationIcon"></div>
+              <div id = "victimLocation" class = "infoStaticText">Location</div>
+              <div class = "flexBreak"></div>
+              <div class = "infoStaticText">Sector of Activity:</div>
+              <div id = "victimSectors">Sector1 / Sector2</div>
+            </div>
+            <div class = "infoSubtitle">- Details -</div>
+            <div class = "infoSubtitle">- Damage -</div>
+            <div id = "attackDetailsWrapper">
+              <div class = "floatingText" id = "attackInfoDetail">Details Details Details</div>
+            </div>
+            <div id = "attackDamageWrapper">
+              <div class = "floatingText" id = "attackDamage">Details Details Details</div>
+            </div>
+          </div>
+
+      </div>
+    </div>
+
   </div>
 
 
@@ -97,9 +356,12 @@
 
   <script src="https://cdn.babylonjs.com/babylon.js"></script>
   <script src="js\nouislider.js"></script>
+  <script src="js\css-vars-ponyfill.js"></script>
   <script src="js\focusModes.js"></script>
+  <script src="js\statistics.js"></script>
   <script src="https://cdn.babylonjs.com/loaders/babylonjs.loaders.js"></script>
   <script src="js\moment.min.js"></script>
+  <script src="js\simple-scrollbar.min.js"></script>
   <script src="js\main.js"></script>
 
 

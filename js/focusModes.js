@@ -27,11 +27,15 @@ var wrapperAttributionsSwizterland = document.getElementById('wrapperAttribution
 var wrapperAttributionsWorld = document.getElementById('wrapperAttributionsWorld');
 
 var wrapperAttackSelector = document.getElementById('wrapperAttackSelector');
-var wrapperAttackDetails = document.getElementById('wrapperAttackDetails');
+var attackInfosWrapper = document.getElementById('attackInfosWrapper');
+
+var attackSelectorScroll = document.getElementById("attackSelectorScroll");
 
 var sidebar_right = document.getElementById('sidebar_right');
 
 var wrapperTimeline = document.getElementById('wrapperTimeline');
+
+var attackSelectorContent = document.getElementById("attackSelectorContent");
 
 
 const resetCamera = function(){
@@ -54,6 +58,88 @@ const setPickability = function(meshes, status){
   }
 }
 
+const updateAttackButtons = function(canton){
+
+  attackSelectorContent.innerHTML = "";
+
+  var attackIds = [];
+
+  for(i = 0; i < filteredDataSwiss.length; i++){
+    if(canton.indexOf(filteredDataSwiss[i].canton) > -1){
+      addAttackButton(filteredDataSwiss[i].id);
+    }
+  }
+
+}
+
+const addAttackButton = function(id){
+
+  var attack = filteredDataSwiss.filter(function(el) {
+    return el.id == id; // Filter out the appropriate one
+  })
+
+
+  var origin = attack[0].threatActor.country;
+  var victim = attack[0].company;
+  var threatActor = attack[0].threatActor.name;
+
+
+  var label = document.createElement("label");
+  label.className = "attackButton";
+
+  attackSelectorContent.appendChild(label);
+
+  var input = document.createElement("input");
+  input.type = "radio";
+  input.name = "attacks";
+  input.className = "attackInput";
+  input.value = id;
+  input.addEventListener("change", function(event){
+
+    //forward ID to function
+    updateAttackInfosContent(event.target.value);
+  });
+
+  label.appendChild(input);
+
+  var span = document.createElement("span");
+  label.appendChild(span);
+
+  var divLableOrigin = document.createElement("div");
+  divLableOrigin.className = "attackButtonLabels";
+  divLableOrigin.innerHTML = "Origin:"
+
+  var divLableVictim = document.createElement("div");
+  divLableVictim.className = "attackButtonLabels";
+  divLableVictim.innerHTML = "Victim:";
+
+
+  var divLableActor = document.createElement("div");
+  divLableActor.className = "attackButtonLabels";
+  divLableActor.innerHTML = "Actor:";
+
+  var divContentOrigin = document.createElement("div");
+  divContentOrigin.className = "attackButtonContent";
+  divContentOrigin.innerHTML = origin;
+
+  var divContentVictim = document.createElement("div");
+  divContentVictim.className = "attackButtonContent";
+  divContentVictim.innerHTML = victim;
+
+  var divContentActor = document.createElement("div");
+  divContentActor.className = "attackButtonContent";
+  divContentActor.innerHTML = threatActor;
+
+  span.appendChild(divLableOrigin);
+  span.appendChild(divContentOrigin);
+  span.appendChild(divLableVictim);
+  span.appendChild(divContentVictim);
+  span.appendChild(divLableActor);
+  span.appendChild(divContentActor);
+
+}
+
+
 const focusChange = function(focus){
 
 
@@ -67,12 +153,14 @@ const focusChange = function(focus){
         wrapperAttributionsWorld.style.opacity = "0";
 
         wrapperAttackSelector.style.opacity = "0";
-        wrapperAttackDetails.style.opacity = "0";
+        attackInfosWrapper.style.opacity = "0";
 
         wrapperTimeline.style.transform = "translateY(0px)";
 
         sidebar_right.style.transform = "translateX(0px)";
         sidebar_right.style.opacity = "1";
+
+        attackSelectorScroll.style.pointerEvents = "none";
 
 
         setPickability(nodeCantonFills.getChildren(), true);
@@ -105,14 +193,15 @@ const focusChange = function(focus){
       wrapperAttributionsWorld.style.transform = "translateX(0)";
       wrapperAttributionsWorld.style.opacity = "1";
 
-      wrapperAttackDetails.style.opacity = "0";
+      attackInfosWrapper.style.opacity = "0";
       wrapperAttackSelector.style.opacity = "0";
 
-      wrapperTimeline.style.transform = "translateY(100px)";
+      wrapperTimeline.style.transform = "translateY(200px)";
 
       sidebar_right.style.transform = "translateX(200px)";
       sidebar_right.style.opacity = "0";
 
+      attackSelectorScroll.style.pointerEvents = "none";
 
       console.log("change focus to World");
       setPickability(nodeCantonFills.getChildren(), false);
@@ -134,6 +223,9 @@ const focusChange = function(focus){
   if(focus.indexOf("switzerland:") !== -1 ){
 
     var canton = focus.slice(12);
+
+    updateAttackButtons(canton);
+
     var indicatorNode = scene.getNodeByName("IndSwi_"+canton);
     console.log(indicatorNode.getAbsolutePosition().x);
 
@@ -144,12 +236,14 @@ const focusChange = function(focus){
       wrapperAttributionsSwizterland.style.opacity = "0";
 
       wrapperAttackSelector.style.opacity = "1";
-      wrapperAttackDetails.style.opacity = "1";
+      attackInfosWrapper.style.opacity = "1";
 
-      wrapperTimeline.style.transform = "translateY(100px)";
+      wrapperTimeline.style.transform = "translateY(200px)";
 
       sidebar_right.style.transform = "translateX(200px)";
       sidebar_right.style.opacity = "0";
+
+      attackSelectorScroll.style.pointerEvents = "all";
 
       var easingFunction = new BABYLON.ExponentialEase(5);
       easingFunction.setEasingMode(BABYLON.EasingFunction.EASINGMODE_EASEOUT);

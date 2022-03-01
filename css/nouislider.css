@@ -83,13 +83,14 @@
 /* Slider size and handle placement;
  */
 .noUi-horizontal {
-  height: 6px;
+  height: 3px;
+  width: 100%;
 }
 .noUi-horizontal .noUi-handle {
   width: 10px;
   height: 28px;
   right: -8px;
-  top: -11px;
+  top: -12px;
 }
 .noUi-vertical {
   width: 18px;
