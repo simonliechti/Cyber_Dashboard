@@ -81,12 +81,18 @@
 
 
     <div id='header'>
-      <div id="headerTitel">Cyber Threat Center</div>
       <div id="modeSelection_Wrapper">
-        <ul>
-          <li><input type="button" class="modeButton" id="buttonModeSwitzerland" value="Switzerland"></li>
-          <li><input type="button" class="modeButton" id="buttonModeWorld" value="World"></li>
-        </ul>
+        <div id="headerTitel">- Cyber Threat Center -</div>
+        <label for=buttonModeSwitzerland class="modeButton">
+          <input type=radio name ="modeButton" id=buttonModeSwitzerland checked>
+          <span>Switzerland</span>
+        </label>
+
+        <label for=buttonModeWorld class="modeButton">
+          <input type=radio name ="modeButton" id=buttonModeWorld >
+          <span>World</span>
+        </label>
+
        </div>
     </div>
 
@@ -264,33 +270,48 @@
 
     <div id= "wrapperPopupSwizterland">
       <div id = "wrapperAttackSelector">
-        <div ss-container id = attackSelectorScroll>
-          <div id = attackSelectorContent>
-            <!--
-
-            <label class="attackButton">
-            <input type=radio name=attacks class="attackInput" value="testValue" id=radio1 >
+        <div id = attackSelectorContentWrapper>
+          <div id =  attackSelectorContent>
+            <label class="attackButton" id=attackButton1>
+            <input type=radio name=attacks class="attackInput" value="testValue"  >
             <span>
               <div class = attackButtonLabels style="text-align: center" >Origin:</div>
-              <div class = attackButtonContent >Origin Country</div>
+              <div class = attackButtonContent id = attackButtonCountry1 >Origin Country</div>
+              <div class = flexBreak></div>
               <div class = attackButtonLabels style="text-align: center" >Victim:</div>
-              <div class = attackButtonContent >Victim Name</div>
+              <div class = attackButtonContent  id = attackButtonVictim1 >Victim Name</div>
+              <div class = flexBreak></div>
               <div class = attackButtonLabels style="text-align: center" >Actor:</div>
-              <div class = attackButtonContent >Actor Name</div></span></label>
+              <div class = attackButtonContent id = attackButtonActor1 >Actor Name</div></span></label>
 
-            <label class="attackButton">
-            <input type=radio name=attacks class="attackInput" value="testValue" id=radio1 >
+            <label class="attackButton" id=attackButton2>
+            <input type=radio name=attacks class="attackInput" value="testValue"  >
             <span>
               <div class = attackButtonLabels style="text-align: center" >Origin:</div>
-              <div class = attackButtonContent >Origin Country</div>
+              <div class = attackButtonContent id =attackButtonCountry2 >Origin Country</div>
+              <div class = flexBreak></div>
               <div class = attackButtonLabels style="text-align: center" >Victim:</div>
-              <div class = attackButtonContent >Victim Name</div>
+              <div class = attackButtonContent id =attackButtonVictim2 >Victim Name</div>
+              <div class = flexBreak></div>
               <div class = attackButtonLabels style="text-align: center" >Actor:</div>
-              <div class = attackButtonContent >Actor Name</div></span></label>
+              <div class = attackButtonContent id =attackButtonActor2 >Actor Name</div></span></label>
 
-             -->
+            <label class="attackButton" id=attackButton3>
+            <input type=radio name=attacks class="attackInput" value="testValue"  >
+            <span>
+              <div class = attackButtonLabels style="text-align: center" >Origin:</div>
+              <div class = attackButtonContent id =attackButtonCountry3 >Origin Country</div>
+              <div class = flexBreak></div>
+              <div class = attackButtonLabels style="text-align: center" >Victim:</div>
+              <div class = attackButtonContent id =attackButtonVictim3 >Victim Name</div>
+              <div class = flexBreak></div>
+              <div class = attackButtonLabels style="text-align: center" >Actor:</div>
+              <div class = attackButtonContent id =attackButtonActor3 >Actor Name</div></span></label>
           </div>
+          <div class = "attackSelectorArrow" id = attackSelectorNextsPage>Next Page</div>
+          <div class = "attackSelectorArrow" id = attackSelectorPreviousPage>Previous Page</div>
         </div>
+
       </div>
       <div id = "attackInfosWrapper" >
 
@@ -346,7 +367,7 @@
           </div>
 
       </div>
-    </div>
+
 
   </div>
 

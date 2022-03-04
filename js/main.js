@@ -8,7 +8,7 @@ www.simonliechti.com
 
 cssVars({
   rootElement: document, // default
-  onlyLegacy: false
+  onlyLegacy: true
 });
 
 
@@ -47,6 +47,29 @@ document.getElementById("buttonNone").onclick = function(){
   filterAttacks();
 };
 
+document.getElementById("attackSelectorNextsPage").onclick = function(){
+  attackSelectorArrow("up");
+};
+
+document.getElementById("attackSelectorPreviousPage").onclick = function(){
+  attackSelectorArrow("down");
+};
+
+document.getElementById("attackButton1").getElementsByTagName("input")[0].addEventListener("change", function(event){
+
+  updateAttackInfosContent(event.target.value);
+});
+
+document.getElementById("attackButton2").getElementsByTagName("input")[0].addEventListener("change", function(event){
+
+  updateAttackInfosContent(event.target.value);
+});
+
+document.getElementById("attackButton3").getElementsByTagName("input")[0].addEventListener("change", function(event){
+
+  updateAttackInfosContent(event.target.value);
+});
+
 
 const canvas = document.getElementById("renderCanvas"); // Get the canvas element
 
@@ -84,6 +107,12 @@ var dataSwiss = null;
 var filteredDataSwiss = null;
 var debug = false;
 var edgeThickness = 0;
+
+var attackSelectorCurrentPage = 0;
+var attackInfosActiveID = null;
+var attackButton1 = document.getElementById("attackButton1");
+var attackButton2 = document.getElementById("attackButton2");
+var attackButton3 = document.getElementById("attackButton3");
 
 const baseFillVisibility = 0;
 const highlightVisibility = 0.5;
@@ -224,7 +253,7 @@ const loadModels = function(){ // Load gltf, populate global mesh variables, dis
        fills[i].isPickable = true;
        fills[i].enableEdgesRendering();
        fills[i].edgesWidth = 1;
-       fills[i].edgesColor = new BABYLON.Color4(1,1,1,.4);
+       fills[i].edgesColor = new BABYLON.Color4( .9, .9, 1,.9);
       };
 
       //Loop over country fills set visibility
@@ -248,13 +277,18 @@ const loadModels = function(){ // Load gltf, populate global mesh variables, dis
 
       // Fresnel
       material.emissiveFresnelParameters = new BABYLON.FresnelParameters();
-      material.emissiveFresnelParameters.power = 2;
-      material.emissiveFresnelParameters.bias = 0.3;
-      material.emissiveFresnelParameters.leftColor = new BABYLON.Color3(0.125/2, 0.204/2, 0.25/2);
-      material.emissiveFresnelParameters.rightColor = new BABYLON.Color3(0.125/8, 0.204/8, 0.25/8);
+      material.emissiveFresnelParameters.power = 1;
+      material.emissiveFresnelParameters.bias = 0.5;
+      material.emissiveFresnelParameters.leftColor = new BABYLON.Color3(0.1/8, 0.15/8, 0.25/8);
+      material.emissiveFresnelParameters.rightColor = new BABYLON.Color3(0.1/3, 0.15/3, 0.25/3);
 
       var rim = scene.getMeshByName("map_base_primitive1");
-      rim.material = material;
+      var swissBase = scene.getMeshByName("map_base_primitive0");
+      if(rim){
+        rim.material = material;
+        swissBase.material = material;
+      }
+
 
 
 
@@ -419,8 +453,12 @@ const addPointerEvents = function(){ //PointerEvents for all user Interaction wi
       floorPlane.isPickable = true;
       var hit = scene.pick(pointerInfo.event.clientX, pointerInfo.event.clientY);
 
+
       currentScenePosition.x = hit.pickedPoint.x;
       currentScenePosition.z = hit.pickedPoint.z;
+
+
+
 
       //set clicked status
       clicked = true;
@@ -538,7 +576,7 @@ const highlightHovered = function(pointerInfo){ // hightlighting hovered mesh an
       if(lastHoveredObject){
         lastHoveredObject.visibility = baseFillVisibility;
       }
-        hoveredObject.visibility = .5;
+        hoveredObject.visibility = .2;
     }
 
    lastHoveredObject = hoveredObject;
@@ -634,10 +672,19 @@ const updateIndicators = function(){
   }
 }
 
+const convertSliderPositionToDate = function(value){
+  var today = moment();
+  var date = moment(today.month()+1, "MM");
+
+  return date.add(value, "months");
+}
+
+
 const filterAttacks = function(){
 
   var slider = document.getElementById('timelineSwitzerland');
   var sliderPositions = slider.noUiSlider.get();
+  console.log(sliderPositions);
 
   var attributionButtonsSwitzerland = document.getElementsByName("attributionButtonSwitzerland");
   var checkedAttributions = [];
@@ -649,17 +696,13 @@ const filterAttacks = function(){
     }
   }
 
-  var today = moment();
 
   //creating maxDate&minDate by rounding up current Day to the next Month
-  var maxDate = moment(today.month()+1, "MM");
-  var minDate = moment(today.month()+1, "MM");
-  maxDate.add(1, 'months');
-  minDate.add(1, 'months');
+  var maxDate = convertSliderPositionToDate(sliderPositions[1]);
+  console.log(maxDate);
+  var minDate = convertSliderPositionToDate(sliderPositions[0]);
+  // minDate = moment(minDate.month()-1, "MM");
 
-  minDate.add(sliderPositions[0], "months");
-  maxDate.add(sliderPositions[1], "months");
-  //var maxDate = maxDate.add(sliderPositions[1], "months");
 
 
   for ( i = 0; i < dataSwiss.length; i++ ){
@@ -697,6 +740,12 @@ const createSlider = function(start, end){
       range: {
           'min': start,
           'max': end
+      },
+      tooltips: {
+        from: Number,
+        to: function(value) {
+          return convertSliderPositionToDate(value).format('MMM YYYY');
+        }
       }
 
 
@@ -748,7 +797,7 @@ const initializeUI = function(){
   var endMonth = today.getMonth();
   var endYear = today.getFullYear();
 
-  var range = (12*(endYear-startYear))+ endMonth - startMonth + 1;
+  var range = (12*(endYear-startYear))+ endMonth - startMonth;
   createSlider(-range,0);
 
 
@@ -832,14 +881,103 @@ const updateWorldAttributions = function(mode){
   }
 }
 
+const attackSelectorArrow = function(direction){
+
+  var maxPage = Math.floor(attacksToInspect.length / 3 );
+
+
+
+
+  if(direction == "up" && attackSelectorCurrentPage < maxPage){
+
+
+    attackSelectorCurrentPage++;
+    var rotation = "rotateX(" + attackSelectorCurrentPage * 180 + "deg)";
+
+    var scale = "scaleY(1)";
+    if(attackSelectorCurrentPage % 2 != 0) {
+      scale = "scaleY(-1)";
+    }
+
+    console.log(rotation);
+    attackButton1.style.transform = rotation + " " + scale;
+    attackButton1.childNodes[1].checked = false;
+
+    attackButton2.style.transform = rotation + " " + scale;
+    attackButton2.childNodes[1].checked = false;
+
+    attackButton3.style.transform = rotation + " " + scale;
+    attackButton3.childNodes[1].checked = false;
+
+    fillAttackButtons();
+  }
+
+  if(direction == "down" && attackSelectorCurrentPage > 0){
+
+    console.log("down");
+    attackSelectorCurrentPage--;
+
+    var rotation = "rotateX(" + attackSelectorCurrentPage * 180 + "deg)";
+
+    var scale = "scaleY(1)";
+    if(attackSelectorCurrentPage % 2 != 0) {
+      scale = "scaleY(-1)";
+    }
+
+    attackButton1.style.transform = rotation + " " + scale;
+    attackButton1.childNodes[1].checked = false;
+
+    attackButton2.style.transform = rotation + " " + scale;
+    attackButton2.childNodes[1].checked = false;
+
+    attackButton3.style.transform = rotation + " " + scale;
+    attackButton3.childNodes[1].checked = false;
+
+    fillAttackButtons();
+  }
+}
+
+const fillAttackButtons = function(){
+
+  for(i = 0; i < Math.min(3, attacksToInspect.length); i++){
+    document.getElementById("attackButton" + (i+1)).style.opacity = 1;
+    if(attacksToInspect[i+attackSelectorCurrentPage*3]){
+
+
+
+      var attack = attacksToInspect[i+attackSelectorCurrentPage*3];
+      console.log(attack);
+      document.getElementById("attackButton" + (i+1)).getElementsByTagName("input")[0].value = attack.id;
+
+      if(attackInfosActiveID == attack.id){
+        document.getElementById("attackButton" + (i+1)).getElementsByTagName("input")[0].checked = true;
+      }
+      else{
+        document.getElementById("attackButton" + (i+1)).getElementsByTagName("input")[0].checked = false;
+      }
+
+      document.getElementById("attackButtonCountry" + (i+1)).innerHTML = attack.threatActor.country;
+      document.getElementById("attackButtonVictim" + (i+1)).innerHTML = attack.company;
+      document.getElementById("attackButtonActor" + (i+1)).innerHTML = attack.threatActor.name;
+    }
+    else{
+      console.log("hide button");
+      document.getElementById("attackButton" + (i+1)).style.opacity = 0;
+    }
+  }
+
+}
 
 const updateAttackInfosContent = function(id){
 
+  attackInfosWrapper.style.opacity = "1";
+  attackInfosWrapper.style.transform = "scale(1)";
+
+  attackInfosActiveID = id;
 
   var selectedAttack = filteredDataSwiss.filter(function(el) {
     return el.id == id; // Filter out the appropriate one
   })
-  console.log(selectedAttack[0]);
 
   var aliases = "";
   var sectors = "";
@@ -891,6 +1029,8 @@ const updateAttackInfosContent = function(id){
 
 
 }
+
+
 
 const scene = createScene(); //Call the createScene function
 

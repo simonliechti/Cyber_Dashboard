@@ -155,10 +155,6 @@ const evaluateStatisticsSelection = function(){
         actorStats[4] = ['Others', filteredDataSwiss.length - actorStats[0][1] - actorStats[1][1] - actorStats[2][1] - actorStats[3][1]];
     }
 
-console.log(countryStats);
-console.log(motiveStats);
-console.log(sectorStats);
-console.log(actorStats);
 }
 
 const evaluateStatisticsOverall = function(){

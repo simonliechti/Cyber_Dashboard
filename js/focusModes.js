@@ -23,6 +23,8 @@ const scaleSwiss = new BABYLON.Vector3( 1.5 ,1.5 ,-1.5 );
 
 var activeFocus = "";
 
+var attacksToInspect;
+
 var wrapperAttributionsSwizterland = document.getElementById('wrapperAttributionsSwizterland');
 var wrapperAttributionsWorld = document.getElementById('wrapperAttributionsWorld');
 
@@ -35,8 +37,10 @@ var sidebar_right = document.getElementById('sidebar_right');
 
 var wrapperTimeline = document.getElementById('wrapperTimeline');
 
+var attackSelectorContentWrapper = document.getElementById("attackSelectorContentWrapper");
 var attackSelectorContent = document.getElementById("attackSelectorContent");
-
+var attackSelectorPreviousPage = document.getElementById("attackSelectorPreviousPage");
+var attackSelectorNextsPage = document.getElementById("attackSelectorNextsPage");
 
 const resetCamera = function(){
 
@@ -60,15 +64,50 @@ const setPickability = function(meshes, status){
 
 const updateAttackButtons = function(canton){
 
-  attackSelectorContent.innerHTML = "";
+  attackSelectorCurrentPage = 0;
 
-  var attackIds = [];
+  attacksToInspect = filterByCanton(canton); //get all attacks of one location
+  console.log(attacksToInspect);
 
-  for(i = 0; i < filteredDataSwiss.length; i++){
-    if(canton.indexOf(filteredDataSwiss[i].canton) > -1){
-      addAttackButton(filteredDataSwiss[i].id);
-    }
+  // RESET SELECTOR STATE TO JUST ONE SINGLE BUTTON
+  if(attackButton2.parentNode){
+   attackSelectorContent.removeChild(attackButton2);
   }
+
+  if(attackButton3.parentNode){
+   attackSelectorContent.removeChild(attackButton3);
+  }
+
+  if(attackSelectorPreviousPage.parentNode){
+     attackSelectorContentWrapper.removeChild(attackSelectorPreviousPage);
+  }
+
+  if(attackSelectorNextsPage.parentNode){
+     attackSelectorContentWrapper.removeChild(attackSelectorNextsPage);
+  }
+
+
+  //ADD BUTTON 2 IF NEEDED
+  if(attacksToInspect.length > 1){
+   attackSelectorContent.appendChild(attackButton2);
+   console.log("adding button 2");
+  }
+
+  //ADD BUTTON 3 IF NEEDED
+  if(attacksToInspect.length > 2){
+   attackSelectorContent.appendChild(attackButton3);
+   console.log("adding button 3");
+  }
+
+  if(attacksToInspect.length > 3){
+
+    attackSelectorContentWrapper.appendChild(attackSelectorPreviousPage);
+    attackSelectorContentWrapper.appendChild(attackSelectorNextsPage);
+
+
+  }
+
+  fillAttackButtons();
 
 }
 
@@ -142,25 +181,32 @@ const addAttackButton = function(id){
 
 const focusChange = function(focus){
 
+  console.log("focusChange");
+
 
   if(focus == "switzerland"){
     if(activeFocus != focus){
 
+        attackInfosActiveID = null;
+
         wrapperAttributionsSwizterland.style.transform = "translateX(0px)";
         wrapperAttributionsSwizterland.style.opacity = "1";
 
-        wrapperAttributionsWorld.style.transform = "translateX(-200px)";
+        wrapperAttributionsWorld.style.transform = "translateX(-30vh)";
         wrapperAttributionsWorld.style.opacity = "0";
 
         wrapperAttackSelector.style.opacity = "0";
-        attackInfosWrapper.style.opacity = "0";
+        wrapperAttackSelector.style.transform = "scale(0)";
+        wrapperAttackSelector.style.transition = "opacity 500ms 0ms, transform 500ms 0ms";
 
-        wrapperTimeline.style.transform = "translateY(0px)";
+        attackInfosWrapper.style.opacity = "0";
+        attackInfosWrapper.style.transform = "scale(0)";
+
+        wrapperTimeline.style.transform = "translateY(0)";
 
         sidebar_right.style.transform = "translateX(0px)";
         sidebar_right.style.opacity = "1";
 
-        attackSelectorScroll.style.pointerEvents = "none";
 
 
         setPickability(nodeCantonFills.getChildren(), true);
@@ -187,21 +233,26 @@ const focusChange = function(focus){
   if(focus == "world"){
     if(activeFocus != focus){
 
-      wrapperAttributionsSwizterland.style.transform = "translateX(-200px)";
+      wrapperAttributionsSwizterland.style.transform = "translateX(-30vh)";
       wrapperAttributionsSwizterland.style.opacity = "0";
 
       wrapperAttributionsWorld.style.transform = "translateX(0)";
       wrapperAttributionsWorld.style.opacity = "1";
 
       attackInfosWrapper.style.opacity = "0";
+      attackInfosWrapper.style.transform = "scale(0)";
+
+
       wrapperAttackSelector.style.opacity = "0";
+      wrapperAttackSelector.style.transform = "scale(0)";
+      wrapperAttackSelector.style.transition = "opacity 500ms 0s, transform 500ms 0s";
 
-      wrapperTimeline.style.transform = "translateY(200px)";
+      wrapperTimeline.style.transform = "translateY(30vh)";
 
-      sidebar_right.style.transform = "translateX(200px)";
+      sidebar_right.style.transform = "translateX(30vh)";
       sidebar_right.style.opacity = "0";
 
-      attackSelectorScroll.style.pointerEvents = "none";
+      // attackSelectorScroll.style.pointerEvents = "none";
 
       console.log("change focus to World");
       setPickability(nodeCantonFills.getChildren(), false);
@@ -232,18 +283,19 @@ const focusChange = function(focus){
     var position = new BABYLON.Vector3(indicatorNode.getAbsolutePosition().x, indicatorNode.getAbsolutePosition().y, indicatorNode.getAbsolutePosition().z -0.2 );
     if(activeFocus != focus && indicatorNode.getChildren().length > 0){
 
-      wrapperAttributionsSwizterland.style.transform = "translateX(-200px)";
+      wrapperAttributionsSwizterland.style.transform = "translateX(-30vh)";
       wrapperAttributionsSwizterland.style.opacity = "0";
 
       wrapperAttackSelector.style.opacity = "1";
-      attackInfosWrapper.style.opacity = "1";
+      wrapperAttackSelector.style.transform = "scale(1)";
+      wrapperAttackSelector.style.transition = "opacity 500ms 500ms, transform 500ms 500ms";
 
-      wrapperTimeline.style.transform = "translateY(200px)";
 
-      sidebar_right.style.transform = "translateX(200px)";
+      wrapperTimeline.style.transform = "translateY(30vh)";
+
+      sidebar_right.style.transform = "translateX(30vh)";
       sidebar_right.style.opacity = "0";
 
-      attackSelectorScroll.style.pointerEvents = "all";
 
       var easingFunction = new BABYLON.ExponentialEase(5);
       easingFunction.setEasingMode(BABYLON.EasingFunction.EASINGMODE_EASEOUT);
