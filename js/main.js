@@ -35,7 +35,6 @@ document.getElementById("buttonAll").onclick = function(){
     buttons[i].checked = true;
   }
   filterAttacks();
-  console.log(dataSwiss);
 };
 
 document.getElementById("buttonNone").onclick = function(){
@@ -71,7 +70,7 @@ document.getElementById("attackButton3").getElementsByTagName("input")[0].addEve
 });
 
 
-const canvas = document.getElementById("renderCanvas"); // Get the canvas element
+const canvas = document.getElementById("renderCanvas");
 
 canvas.oncontextmenu = function() { //disable left-click context menu for renderCanvas
   return false;
@@ -103,8 +102,8 @@ const attackDamage = document.getElementById("attackDamage");
 //global variables
 var modelsLoaded = false;
 var dataWorld = null;
-var dataSwiss = null;
-var filteredDataSwiss = null;
+var dataAttacks = null;
+var filteredDataAttacks = null;
 var debug = false;
 var edgeThickness = 0;
 
@@ -139,6 +138,8 @@ var lowerRadiusLimit = 3;
 var upperRadiusLimit = 10;
 
 const CAM_ROTATION_SENSITIVITY = 1000;
+
+var interactiveCamera = true;
 
 
 //pointer variables
@@ -315,9 +316,9 @@ const loadData = function(){
 
   loadJsonFromRemote(databaseEndpointSwiss, function(data) {
     if(data !== 404){
-      dataSwiss = data;
-      for(i=0; i<dataSwiss.length; i++){
-          var e = dataSwiss[i];
+      dataAttacks = data;
+      for(i=0; i<dataAttacks.length; i++){
+          var e = dataAttacks[i];
           if(e.threatActor === null){
               e.threatActor = {name: 'Unknown', campaignDescription: 'The threat actor has not yet been identified.', country: 'Unknown', motivations: [], aliases:[]};
           }
@@ -327,9 +328,9 @@ const loadData = function(){
     if(data == 404){
       console.log("fallback to devedis server for endpoint /api/list");
       loadJsonFromRemote('https://cyber.devedis.dev/list', function(data){
-        dataSwiss = data;
-        for(i=0; i<dataSwiss.length; i++){
-            var e = dataSwiss[i];
+        dataAttacks = data;
+        for(i=0; i<dataAttacks.length; i++){
+            var e = dataAttacks[i];
             if(e.threatActor === null){
                 e.threatActor = {name: 'Unknown', campaignDescription: 'The threat actor has not yet been identified.', country: 'Unknown', motivations: [], aliases:[]};
             }
@@ -386,7 +387,8 @@ const loadJsonFromRemote = function (url, callback){ //function to load and pars
 };
 
 const addPointerEvents = function(){ //PointerEvents for all user Interaction with 3D scene
-  console.log("add Pointer events");
+
+
   scene.onPointerObservable.add(function(pointerInfo){
     switch (pointerInfo.type) {
 
@@ -402,7 +404,7 @@ const addPointerEvents = function(){ //PointerEvents for all user Interaction wi
 
 
 
-        if(event.deltaY < 0 && camera.position.z > lowerRadiusLimit){
+        if(event.deltaY < 0 && camera.position.z > lowerRadiusLimit && interactiveCamera === true){
           camera.position.z *= 0.97;
 
           if(hit.pickedPoint){
@@ -413,7 +415,7 @@ const addPointerEvents = function(){ //PointerEvents for all user Interaction wi
           }
 
         }
-        if(event.deltaY > 0 && camera.position.z < upperRadiusLimit){
+        if(event.deltaY > 0 && camera.position.z < upperRadiusLimit && interactiveCamera === true){
           camera.position.z *= 1.03;
 
           if(hit.pickedPoint){
@@ -501,7 +503,7 @@ const addPointerEvents = function(){ //PointerEvents for all user Interaction wi
 
 
       //rotate camera
-      if(buttonPressed === "left"){
+      if(buttonPressed === "left" && interactiveCamera === true){
         //set last values before rotation
         oldAlpha = cameraAlpha.rotation.y;
         oldBeta = cameraBeta.rotation.x;
@@ -521,7 +523,7 @@ const addPointerEvents = function(){ //PointerEvents for all user Interaction wi
   		  currentPosition.y = event.clientY;
       }
       //pan camera
-      if(buttonPressed === "right"){
+      if(buttonPressed === "right" && interactiveCamera === true){
         //last values before moving
         oldAlphaPos.x = cameraAlpha.position.x;
         oldAlphaPos.z = cameraAlpha.position.z;
@@ -607,6 +609,7 @@ const addRenderObservables = function(){ //Update Functions beforeRender & after
 
 
   const afterRender = scene.onAfterRenderObservable.add(function () {
+
 	 if (!mousemov) {
   		lastAlphaDiff = lastAlphaDiff / 1.1;
   		lastBetaDiff = lastBetaDiff / 1.1;
@@ -631,7 +634,7 @@ const addRenderObservables = function(){ //Update Functions beforeRender & after
 }
 
 const filterByCanton = function(canton){
-  return filteredDataSwiss.filter(function(el) {
+  return filteredDataAttacks.filter(function(el) {
     return el.canton.indexOf(canton) > -1;
   })
 }
@@ -684,11 +687,11 @@ const filterAttacks = function(){
 
   var slider = document.getElementById('timelineSwitzerland');
   var sliderPositions = slider.noUiSlider.get();
-  console.log(sliderPositions);
 
   var attributionButtonsSwitzerland = document.getElementsByName("attributionButtonSwitzerland");
   var checkedAttributions = [];
-  filteredDataSwiss = [];
+  filteredDataAttacks = [];
+
 
   for (i = 0; i < attributionButtonsSwitzerland.length ; i++){
     if(attributionButtonsSwitzerland[i].checked){
@@ -697,28 +700,39 @@ const filterAttacks = function(){
   }
 
 
-  //creating maxDate&minDate by rounding up current Day to the next Month
   var maxDate = convertSliderPositionToDate(sliderPositions[1]);
-  console.log(maxDate);
+  maxDate = maxDate.add(1, 'M'); // Add 1 Month to get the full Range for filtering
+
   var minDate = convertSliderPositionToDate(sliderPositions[0]);
-  // minDate = moment(minDate.month()-1, "MM");
 
 
 
-  for ( i = 0; i < dataSwiss.length; i++ ){
-    var discoveryDate = moment(dataSwiss[i].discoveryDate);
-    var cleanupDate = moment(dataSwiss[i].cleanupDate);
-    var attribution = dataSwiss[i].threatActor.country
 
-    if(dataSwiss[i].cleanupDate == null){
-      cleanupDate = moment();
+
+
+  for ( i = 0; i < dataAttacks.length; i++ ){
+
+
+    if(dataAttacks[i].infectionDate){
+      var startDate = moment(dataAttacks[i].infectionDate);
     }
 
-    if(checkedAttributions.indexOf(attribution) === -1 || discoveryDate > maxDate || cleanupDate < minDate || !dataSwiss[i].canton ){
-      //do nothing
-    }
     else{
-      filteredDataSwiss.push(dataSwiss[i]);
+      var startDate = moment(dataAttacks[i].discoveryDate);
+    }
+
+    var endDate = moment(dataAttacks[i].cleanupDate);
+
+    var attribution = dataAttacks[i].threatActor.country
+
+
+    if(dataAttacks[i].cleanupDate == null){
+      endDate = moment();
+    }
+
+
+    if(checkedAttributions.indexOf(attribution) != -1 && maxDate > startDate && minDate < endDate && dataAttacks[i].canton){
+      filteredDataAttacks.push(dataAttacks[i]);
     }
   }
   updateIndicators();
@@ -756,14 +770,14 @@ const createSlider = function(start, end){
 };
 
 const initializeScene = function(){
-  if(modelsLoaded == true && dataSwiss && dataWorld){
+  if(modelsLoaded == true && dataAttacks && dataWorld){
 
     addPointerEvents();
     addRenderObservables();
     initializeUI();
     filterAttacks();
     console.log("initialize scene");
-    console.log(dataSwiss);
+    console.log(dataAttacks);
 
   }
 
@@ -774,17 +788,17 @@ const initializeScene = function(){
 
 const initializeUI = function(){
 
-  var firstAttackDate = dataSwiss[0].discoveryDate;
+  var firstAttackDate = dataAttacks[0].discoveryDate;
   var today = new Date;
   var attributions = [];
 
-  for(i = 0; i < dataSwiss.length; i++){
+  for(i = 0; i < dataAttacks.length; i++){
     // get the earliest discoveryDate && all attributions
-    if(dataSwiss[i].discoveryDate < firstAttackDate){
-      firstAttackDate = dataSwiss[i].discoveryDate;
+    if(dataAttacks[i].discoveryDate < firstAttackDate){
+      firstAttackDate = dataAttacks[i].discoveryDate;
     }
-    if(attributions.indexOf(dataSwiss[i].threatActor.country) == -1){
-      attributions.push(dataSwiss[i].threatActor.country);
+    if(attributions.indexOf(dataAttacks[i].threatActor.country) == -1){
+      attributions.push(dataAttacks[i].threatActor.country);
     }
   }
   attributions.sort();
@@ -975,7 +989,7 @@ const updateAttackInfosContent = function(id){
 
   attackInfosActiveID = id;
 
-  var selectedAttack = filteredDataSwiss.filter(function(el) {
+  var selectedAttack = filteredDataAttacks.filter(function(el) {
     return el.id == id; // Filter out the appropriate one
   })
 

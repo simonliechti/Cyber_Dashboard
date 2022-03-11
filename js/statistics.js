@@ -60,9 +60,9 @@ const evaluateStatisticsSelection = function(){
     motiveStats = [];
     sectorStats = [];
     actorStats = [];
-      for(i=0; i<filteredDataSwiss.length; i++){
+      for(i=0; i<filteredDataAttacks.length; i++){
            //Evalutate Country
-        var country = filteredDataSwiss[i].threatActor.country;
+        var country = filteredDataAttacks[i].threatActor.country;
         var index = countryStats.map(function(e) { return e[0]; }).indexOf(country);
 
         if(index == -1){
@@ -73,9 +73,9 @@ const evaluateStatisticsSelection = function(){
           }
 
           //Evluate Motive
-          for(u=0; u<filteredDataSwiss[i].threatActor.motivations.length; u++){
+          for(u=0; u<filteredDataAttacks[i].threatActor.motivations.length; u++){
 
-                  var motivation = filteredDataSwiss[i].threatActor.motivations[u].name;
+                  var motivation = filteredDataAttacks[i].threatActor.motivations[u].name;
 
                   //get the index
                   var index = motiveStats.map(function(e) { return e[0]; }).indexOf(motivation);
@@ -90,9 +90,9 @@ const evaluateStatisticsSelection = function(){
 
           // Evaluate Sector
 
-          for(u=0; u<filteredDataSwiss[i].sectors.length; u++){
+          for(u=0; u<filteredDataAttacks[i].sectors.length; u++){
 
-              var sector = filteredDataSwiss[i].sectors[u].name;
+              var sector = filteredDataAttacks[i].sectors[u].name;
 
               //get the index
               var index = sectorStats.map(function(e) { return e[0]; }).indexOf(sector);
@@ -106,7 +106,7 @@ const evaluateStatisticsSelection = function(){
           }
 
           //Evaluate Actor
-         var threatActor = filteredDataSwiss[i].threatActor.name;
+         var threatActor = filteredDataAttacks[i].threatActor.name;
 
          //get the index
          var index = actorStats.map(function(e) { return e[0]; }).indexOf(threatActor);
@@ -148,30 +148,30 @@ const evaluateStatisticsSelection = function(){
 
 
   if(countryStats.length>5){
-      countryStats[4] = ['Others', filteredDataSwiss.length - countryStats[0][1] - countryStats[1][1] - countryStats[2][1] - countryStats[3][1]];
+      countryStats[4] = ['Others', filteredDataAttacks.length - countryStats[0][1] - countryStats[1][1] - countryStats[2][1] - countryStats[3][1]];
   }
 
   if(actorStats.length>5){
-        actorStats[4] = ['Others', filteredDataSwiss.length - actorStats[0][1] - actorStats[1][1] - actorStats[2][1] - actorStats[3][1]];
+        actorStats[4] = ['Others', filteredDataAttacks.length - actorStats[0][1] - actorStats[1][1] - actorStats[2][1] - actorStats[3][1]];
     }
 
 }
 
 const evaluateStatisticsOverall = function(){
 
- if(dataSwiss.length > 0){
+ if(dataAttacks.length > 0){
 
-    for(i=0; i<dataSwiss.length; i++){
+    for(i=0; i<dataAttacks.length; i++){
 
-        if(overallStatsActors.indexOf(dataSwiss[i].threatActor.name) === -1){
-            overallStatsActors.push(dataSwiss[i].threatActor.name);
+        if(overallStatsActors.indexOf(dataAttacks[i].threatActor.name) === -1){
+            overallStatsActors.push(dataAttacks[i].threatActor.name);
         }
 
-        if(overallStatsVictims.indexOf(dataSwiss[i].company) === -1){
-            overallStatsVictims.push(dataSwiss[i].company);
+        if(overallStatsVictims.indexOf(dataAttacks[i].company) === -1){
+            overallStatsVictims.push(dataAttacks[i].company);
         }
 
-        if(dataSwiss[i].cleanupDate){
+        if(dataAttacks[i].cleanupDate){
             this.overallStatsOngoing++;
         }
     }
@@ -239,7 +239,7 @@ const updateStatisticsUi = function(){
 
 
 const updateStatistics = function(){
-  if(filteredDataSwiss.length > 0){
+  if(filteredDataAttacks.length > 0){
     evaluateStatisticsSelection();
 
   }

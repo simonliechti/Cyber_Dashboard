@@ -113,7 +113,7 @@ const updateAttackButtons = function(canton){
 
 const addAttackButton = function(id){
 
-  var attack = filteredDataSwiss.filter(function(el) {
+  var attack = filteredDataAttacks.filter(function(el) {
     return el.id == id; // Filter out the appropriate one
   })
 
@@ -212,6 +212,8 @@ const focusChange = function(focus){
         setPickability(nodeCantonFills.getChildren(), true);
         setPickability(nodeCountryFills.getChildren(), false);
 
+        interactiveCamera = true; // enable interactive camera movement
+
         var easingFunction = new BABYLON.QuadraticEase();
         easingFunction.setEasingMode(BABYLON.EasingFunction.EASINGMODE_EASEINOUT);
         BABYLON.Animation.CreateAndStartAnimation("anim_scale", root, "scaling", 60, TRANSITION_DURATION, root.scaling, scaleSwiss, 0, easingFunction);
@@ -257,6 +259,8 @@ const focusChange = function(focus){
       console.log("change focus to World");
       setPickability(nodeCantonFills.getChildren(), false);
       setPickability(nodeCountryFills.getChildren(), true);
+
+      interactiveCamera = true; // enable interactive camera movement
 
       var easingFunction = new BABYLON.ExponentialEase(10);
       easingFunction.setEasingMode(BABYLON.EasingFunction.EASINGMODE_EASEOUT);
@@ -308,6 +312,8 @@ const focusChange = function(focus){
       activeFocus = focus;
       setPickability(nodeCantonFills.getChildren(), false);
       setPickability(nodeCountryFills.getChildren(), false);
+
+      interactiveCamera = false; // disable interactive camera movement
     }
 
   }

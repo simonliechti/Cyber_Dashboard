@@ -52,7 +52,8 @@ body {
   width: 100%;
   height: 100%;
   /* background-image: radial-gradient(circle farthest-side, hsl(210, 17%, 0%) ,hsl(210, 17%, 8%)); */
-  background: radial-gradient(hsla(218, 30%, 10%) ,hsl(218, 35%, 6%));
+  background: radial-gradient(hsl(218, 30%, 10%) ,hsl(218, 35%, 6%));
+  background: -ms-radial-gradient(center, circle, hsl(218, 30%, 10%) ,hsl(218, 35%, 6%));
   /* background: radial-gradient(#0A0E15 ,#080C11); */
   /* background-color: black; */
   z-index: -2;
