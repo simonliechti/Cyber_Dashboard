@@ -14,6 +14,8 @@
     <canvas id="renderCanvas" touch-action="none"></canvas>
   </div>
 
+
+
   <div id="containerUI" >
     <div id="tooltip">Tooltip</div>
 
@@ -239,19 +241,19 @@
             <div class = "statisticsSubGroup">
               <div class = "statisticsSubGroupName">Threat Actors</div>
               <div id = "overallActorsValue" class = "statisticsSubGroupValue">Value</div>
-              <div class = "statisticsSubGroupBar"></div>
+              <div class = "statisticsSubGroupBar" style = "opacity: 0"></div>
               <div class = "statisticsSubGroupBarFill"></div>
             </div>
             <div class = "statisticsSubGroup">
               <div class = "statisticsSubGroupName">Victims</div>
               <div id = "overallVictimsValue" class = "statisticsSubGroupValue">Value</div>
-              <div class = "statisticsSubGroupBar"></div>
+              <div class = "statisticsSubGroupBar" style = "opacity: 0"></div>
               <div class = "statisticsSubGroupBarFill"></div>
             </div>
             <div class = "statisticsSubGroup">
               <div class = "statisticsSubGroupName">Ongoing Attacks</div>
               <div id = "overallOngoingValues" class = "statisticsSubGroupValue">Value</div>
-              <div class = "statisticsSubGroupBar"></div>
+              <div class = "statisticsSubGroupBar" style = "opacity: 0"></div>
               <div class = "statisticsSubGroupBarFill"></div>
             </div>
           </div>
@@ -308,8 +310,11 @@
               <div class = attackButtonLabels style="text-align: center" >Actor:</div>
               <div class = attackButtonContent id =attackButtonActor3 >Actor Name</div></span></label>
           </div>
-          <div class = "attackSelectorArrow" id = attackSelectorNextsPage>Next Page</div>
-          <div class = "attackSelectorArrow" id = attackSelectorPreviousPage>Previous Page</div>
+          <div id = "attackSelectorPageUI">
+            <img src="css/textures/arrow.svg" class = "attackSelectorArrow" id = "attackSelectorPreviousPage"></img>
+            <div id = "attackSelectorPageCoutner">1 / 1</div>
+            <img src="css/textures/arrow.svg" class = "attackSelectorArrow" id = "attackSelectorNextsPage" style = "transform: rotate(180deg)"></img>
+          </div>
         </div>
 
       </div>
@@ -335,16 +340,16 @@
             </div>
             <div class = "infoSubtitle">- Threat Actor -</div>
             <div id = "attackActorWrapper">
-              <div id = "threatActorName">Threat Actor Name</div>
-              <div class = "floatingText" id = "threatActorAliases">aka Alias1 / Alias2 / Alias3</div>
+              <div class = "threatActorName" id = "threatActorName_popupCH">Threat Actor Name</div>
+              <div class = "floatingText" id = "threatActorAliases_popupCH">aka Alias1 / Alias2 / Alias3</div>
               <div class = "flexBreak"></div>
               <div class = "infoStaticText">Origin: </div>
-              <div id = "threatActorCountry">Country Name</div>
+              <div id = "threatActorCountry_popupCH">Country Name</div>
               <div class = "flexBreak"></div>
               <div class = "infoStaticText">Motivation:</div>
-              <div id = "threatActorMotivation">Motivation1 / Motivation2</div>
+              <div id = "threatActorMotivation_popupCH">Motivation1 / Motivation2</div>
               <div class = "flexBreak"></div>
-              <div class = "floatingText" id ="threatActorDescription"> Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</div>
+              <div class = "floatingText" id ="threatActorDescription_popupCH"> Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</div>
 
             </div>
             <div class = "infoSubtitle">- Victim -</div>
@@ -367,10 +372,40 @@
           </div>
 
       </div>
+    </div>
+
+    <!-- popup world -->
+
+    <div id = "wrapperPopupWorld">
+      <div id="wrapperCountryInfo">
+        <div id="countryName">Country Name</div>
+        <div id="countryDescription" class="floatingText">Country Description</div>
+      </div>
+      <div id="wrapperActorSelector">
+        <div id="wrapperActorList">
+        <div class = "infoSubtitle" style = "width: 100%"> - Threat Actors - </div>
+        <div id="actorList"></div>
+      </div>
+        <div id="wrapperActorInfo">
+          <div class = "threatActorName" id = "threatActorName_popupWorld">Threat Actor Name</div>
+          <div class = "floatingText" id = "threatActorAliases_popupWorld">aka Alias1 / Alias2 / Alias3</div>
+          <div class = "flexBreak"></div>
+          <div class = "infoStaticText">Motivation:</div>
+          <div class = "threatActorMotivation" id = "threatActorMotivation_popupWorld">Motivation1 / Motivation2</div>
+          <div class = "flexBreak"></div>
+          <div class = "floatingText" id ="threatActorDescription_popupWorld"> Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</div></div>
+      </div>
+    </div>
 
 
   </div>
 
+
+  <div id="loadingScreen">
+    <video width="800" height="800" autoplay muted>
+      <source src="css\textures\NDB_Cyber_LogoAnimation_v02.mp4" type="video/mp4">
+    </video>
+  </div>
 
 
 
@@ -378,6 +413,7 @@
   <script src="https://cdn.babylonjs.com/babylon.js"></script>
   <script src="js\nouislider.js"></script>
   <script src="js\css-vars-ponyfill.js"></script>
+  <script src="js\countryCodes.js"></script>
   <script src="js\focusModes.js"></script>
   <script src="js\statistics.js"></script>
   <script src="https://cdn.babylonjs.com/loaders/babylonjs.loaders.js"></script>

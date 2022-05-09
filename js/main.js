@@ -6,12 +6,19 @@ www.simonliechti.com
 */
 
 
+//enable css variables for IE
+//
 cssVars({
   rootElement: document, // default
   onlyLegacy: true
 });
+//
+//
 
 
+
+//Add events on html Objects
+//
 document.getElementById("buttonModeWorld").onclick = function(){
   focusChange("world");
 };
@@ -22,10 +29,16 @@ document.getElementById("buttonModeSwitzerland").onclick = function(){
 
 document.getElementById("buttonAttackers").onclick = function(){
   updateWorldAttributions("attackers");
+  resetMaps();
+  focusChange("world");
+
 };
 
 document.getElementById("buttonVictims").onclick = function(){
   updateWorldAttributions("victims");
+  resetMaps();
+  focusChange("world");
+
 };
 
 document.getElementById("buttonAll").onclick = function(){
@@ -69,27 +82,42 @@ document.getElementById("attackButton3").getElementsByTagName("input")[0].addEve
   updateAttackInfosContent(event.target.value);
 });
 
+//
+//
 
+// disable context menu for the whole renderCanvas
+//
 const canvas = document.getElementById("renderCanvas");
 
 canvas.oncontextmenu = function() { //disable left-click context menu for renderCanvas
   return false;
 }
 
+//
+//
+
+
 // Generate the BABYLON 3D engine
+//
 const engine = new BABYLON.Engine(canvas, true, { stencil: true });
 engine.setHardwareScalingLevel(1 / window.devicePixelRatio);
+//
+//
 
+
+// store html variables as global Constants
+//
 const tooltip = document.getElementById("tooltip");
 
 const chronologyDateInfection = document.getElementById("chronologyDateInfection");
 const chronologyDateDiscovery = document.getElementById("chronologyDateDiscovery");
 const chronologyDateCleanup = document.getElementById("chronologyDateCleanup");
 
-const threatActorName = document.getElementById("threatActorName");
-const threatActorAliases = document.getElementById("threatActorAliases");
-const threatActorCountry = document.getElementById("threatActorCountry");
-const threatActorDescription = document.getElementById("threatActorDescription");
+const threatActorName = document.getElementById("threatActorName_popupCH");
+const threatActorAliases = document.getElementById("threatActorAliases_popupCH");
+const threatActorCountry = document.getElementById("threatActorCountry_popupCH");
+const threatActorMotivation = document.getElementById("threatActorMotivation_popupCH");
+const threatActorDescription = document.getElementById("threatActorDescription_popupCH");
 
 const victimName = document.getElementById("victimName");
 const victimLocation = document.getElementById("victimLocation");
@@ -98,8 +126,12 @@ const victimSectors = document.getElementById("victimSectors");
 const attackInfoDetail = document.getElementById("attackInfoDetail");
 const attackDamage = document.getElementById("attackDamage");
 
+//
+//
+
 
 //global variables
+//
 var modelsLoaded = false;
 var dataWorld = null;
 var dataAttacks = null;
@@ -112,9 +144,14 @@ var attackInfosActiveID = null;
 var attackButton1 = document.getElementById("attackButton1");
 var attackButton2 = document.getElementById("attackButton2");
 var attackButton3 = document.getElementById("attackButton3");
+var loadingScreenDiv = document.getElementById("loadingScreen");
 
-const baseFillVisibility = 0;
+var baseFillVisibility = 0;
 const highlightVisibility = 0.5;
+
+const countryEdgeColor = new BABYLON.Color4(1,1,1,.1);
+const countryAttackerEdgeColor = new BABYLON.Color4(0.9, 0.7, 0.5 ,1);
+const countryVictimEdgeColor = new BABYLON.Color4(.8,.9,1,.8);
 
 var framecount = 0;
 var mxframecount = 120; //4 secs at 60 fps
@@ -137,12 +174,25 @@ var lastRadiusDiff = 0;
 var lowerRadiusLimit = 3;
 var upperRadiusLimit = 10;
 
+var cantons = ['AG','AR','AI','BL','BS','BE','FR','GE','GL','GR','JU','LU','NE','NW','OW','SG','SH','SZ','SO','TG','TI','UR','VD','VS','ZG','ZH'];
+
+//global variables for 3D Objects
+var camera, nodeRoot, nodeCountryFills, nodeCantonFills, nodeMapWorld, meshSwissBorder, meshCountryBorders, meshMapBase, prefabIndicator, cameraAlpha, cameraBeta, floorPlane;
+
+// global variables for Morphs
+var countryBordersMorph, swissBorderMorph;
+
+var globalAttackingCountries, globalVictimCountries;
+
+
+
+//pointer variables
+//
+
 const CAM_ROTATION_SENSITIVITY = 1000;
 
 var interactiveCamera = true;
 
-
-//pointer variables
 var mousemov = false;
 var scroll = false;
 var clicked = false;
@@ -158,13 +208,37 @@ var lowerCameraLimitX = -1;
 var upperCameraLimitZ = 1;
 var lowerCameraLimitZ = -1;
 
-var cantons = ['AG','AR','AI','BL','BS','BE','FR','GE','GL','GR','JU','LU','NE','NW','OW','SG','SH','SZ','SO','TG','TI','UR','VD','VS','ZG','ZH'];
+//
+//
 
-//global variables for 3D Objects
-var camera, nodeRoot, nodeCountryFills, nodeCantonFills, meshSwissBorder, meshCountryBorders, prefabIndicator, cameraAlpha, cameraBeta, floorPlane;
+//Setup Splash Screen
 
-// global variables for Morphs
-var countryBordersMorph, swissBorderMorph;
+var timerStart = Date.now(); //set timerStart to calculate time since the page loaded
+
+function customLoadingScreen() {
+  console.log("customLoadingScreen creation");
+}
+customLoadingScreen.prototype.displayLoadingUI = function(){
+  console.log("customLoadingScreen loading");
+};
+customLoadingScreen.prototype.hideLoadingUI = function(){
+  console.log("customLoadingScreen loaded");
+
+  // hide
+  var timeDelta = Date.now()- timerStart;
+  var delay = 5100 - timeDelta;
+  if(delay < 0){
+    delay = 0;
+  }
+  setTimeout(function(){
+    loadingScreenDiv.style.opacity = "0";},delay);
+
+};
+
+var loadingScreen = new customLoadingScreen();
+engine.loadingScreen = loadingScreen;
+
+
 
 
 //mapRange function
@@ -213,10 +287,14 @@ const loadModels = function(){ // Load gltf, populate global mesh variables, dis
       root = scene.getNodeByName("root");
       nodeCantonFills = scene.getNodeByName("cantonFillsIndividual");
       nodeCountryFills = scene.getNodeByName("countryFills");
+      nodeMapWorld  = scene.getNodeByName("mapWorld");
       meshSwissBorder = scene.getMeshByName("swissBoarder");
       meshLakes = scene.getMeshByName("lakes");
+      meshMapBase = scene.getMeshByName("map_base");
+      meshMapBase.alphaIndex = 2;
       meshCountryBorders = scene.getMeshByName("countryBoarders");
       prefabIndicator = scene.getMeshByName("indicator");
+
 
       countryBordersMorph = meshCountryBorders.morphTargetManager.getTarget(0);
       swissBorderMorph = meshSwissBorder.morphTargetManager.getTarget(0);
@@ -232,24 +310,17 @@ const loadModels = function(){ // Load gltf, populate global mesh variables, dis
 
       //Disable pickable on all meshes
       //
-      //
       scene.meshes.forEach(disablePickable);
 
       function disablePickable(mesh){
         mesh.isPickable = false;
       }
 
-      //Loop over canton fills and boarders, set visibility and pickability
+      //Loop over canton fills, set visibility, pickability and edge rendering
       //
-      //
-      //var boardersNode = scene.getNodeByName("cantonBoardersIndividual");
-
-
-      //boarders = boardersNode.getChildren();
       fills = nodeCantonFills.getChildren();
 
       for(i = 0 ; i < fills.length; i++){
-       //boarders[i].isVisible = false;
        fills[i].visibility = baseFillVisibility;
        fills[i].isPickable = true;
        fills[i].enableEdgesRendering();
@@ -259,18 +330,20 @@ const loadModels = function(){ // Load gltf, populate global mesh variables, dis
 
       //Loop over country fills set visibility
       //
-      //
       var countryFills = scene.getNodeByName("countryFills").getChildren();
 
       for(i = 0 ; i < countryFills.length; i++){
-       countryFills[i].visibility = baseFillVisibility;
-       countryFills[i].isPickable = false;
-       countryFills[i].enableEdgesRendering();
-       countryFills[i].edgesWidth = .45;
-       countryFills[i].edgesColor = new BABYLON.Color4(1,1,1,.4);
+        countryFills[i].visibility = baseFillVisibility;
+        countryFills[i].isPickable = false;
+        countryFills[i].enableEdgesRendering();
+        countryFills[i].edgesWidth = 0.8;
+        countryFills[i].edgesColor = countryEdgeColor;
+
       };
 
 
+      // create and add Material for the rim and base of the swiss map
+      //
       var material = new BABYLON.StandardMaterial("Rim", scene);
       material.diffuseColor = new BABYLON.Color3(0, 0, 0);
       material.emissiveColor = BABYLON.Color3.White();
@@ -283,24 +356,49 @@ const loadModels = function(){ // Load gltf, populate global mesh variables, dis
       material.emissiveFresnelParameters.leftColor = new BABYLON.Color3(0.1/8, 0.15/8, 0.25/8);
       material.emissiveFresnelParameters.rightColor = new BABYLON.Color3(0.1/3, 0.15/3, 0.25/3);
 
-      var rim = scene.getMeshByName("map_base_primitive1");
-      var swissBase = scene.getMeshByName("map_base_primitive0");
-      if(rim){
-        rim.material = material;
-        swissBase.material = material;
-      }
+      scene.getMeshByName("map_base").material = material;;
 
+      var fillMaterial = scene.getMaterialByName("countryFill");
 
+      var attackerFillMaterial = fillMaterial.clone("attackerFillMaterial");
+      attackerFillMaterial.alpha = 0.5;
+      attackerFillMaterial.emissiveColor = new BABYLON.Color3(0.6,0.2,0.1);
 
+      var victimFillMaterial = fillMaterial.clone("victimFillMaterial");
+      victimFillMaterial.alpha = .5;
+      victimFillMaterial.emissiveColor = new BABYLON.Color3(0.3,0.5,0.15);
+      victimFillMaterial.emissiveColor = new BABYLON.Color3(0.2,0.3,0.5);
+
+      var indicatorMaterial = scene.getMaterialByName("Indicator");
+      indicatorMaterial.alphaMode = BABYLON.Engine.ALPHA_ADD;
 
       // set modelLoaded = true and try initializing scene
-      //
       //
       modelsLoaded = true;
 
       initializeScene();
       focusChange("switzerland");
   });
+}
+
+const generateCountryLists = function(){
+
+  globalAttackingCountries = [];
+  globalVictimCountries = [];
+
+
+  for(i = 0; i < dataWorld.attackers.length; i++){
+    if(globalAttackingCountries.indexOf(dataWorld.attackers[i].country) == -1){
+      globalAttackingCountries.push(dataWorld.attackers[i].country);
+    }
+  }
+
+  for(i = 0; i < dataWorld.victims.length; i++){
+    if(globalVictimCountries.indexOf(dataWorld.victims[i].country) == -1){
+      globalVictimCountries.push(dataWorld.victims[i].country);
+    }
+  }
+
 }
 
 const loadData = function(){
@@ -344,13 +442,16 @@ const loadData = function(){
 
     if(data !== 404){
       dataWorld = data;
+      generateCountryLists();
       initializeScene();
+
     }
 
     if(data == 404){
       console.log("fallback to devedis server");
       loadJsonFromRemote('https://cyber.devedis.dev/world', function(data){
         dataWorld = data;
+        generateCountryLists();
         initializeScene();
       });
     }
@@ -492,11 +593,11 @@ const addPointerEvents = function(){ //PointerEvents for all user Interaction wi
 
     positionTooltip(pointerInfo.event);
     // Move Camera only while active mouse click
-    if (clicked) {
+    if (clicked && interactiveCamera == true) {
 			//set mousemov as true if the pointer is still down and moved
 			mousemov = true;
       if(hoveredObject){
-        hoveredObject.visibility = 0;
+        hoveredObject.visibility = baseFillVisibility;
       }
       lastHoveredObject = null;
       tooltip.style.opacity = 0;
@@ -571,22 +672,24 @@ const highlightHovered = function(pointerInfo){ // hightlighting hovered mesh an
   if (hit.pickedMesh){
     hoveredObject = hit.pickedMesh;
 
-    tooltip.style.opacity = 1;
+    //tooltip.style.opacity = 1;
     tooltip.innerHTML = hoveredObject.name;
 
     if(hoveredObject != lastHoveredObject){
       if(lastHoveredObject){
         lastHoveredObject.visibility = baseFillVisibility;
+        console.log("hide last hovered");
       }
-        hoveredObject.visibility = .2;
+        hoveredObject.visibility = .6;
     }
 
    lastHoveredObject = hoveredObject;
    }
    else{
-     tooltip.style.opacity = 0;
+     //tooltip.style.opacity = 0;
      if(lastHoveredObject){
        lastHoveredObject.visibility = baseFillVisibility;
+       console.log("hide last hovered");
      }
      lastHoveredObject = null;
    }
@@ -682,8 +785,8 @@ const convertSliderPositionToDate = function(value){
   return date.add(value, "months");
 }
 
-
 const filterAttacks = function(){
+
 
   var slider = document.getElementById('timelineSwitzerland');
   var sliderPositions = slider.noUiSlider.get();
@@ -848,29 +951,30 @@ const initializeUI = function(){
 }
 
 const updateWorldAttributions = function(mode){
+
   var attributionListWorld = document.getElementById("attributionListWorld");
   var attributions = [];
   console.log(dataWorld);
 
+
+
   if(mode == "attackers"){
-    for(i = 0; i < dataWorld.attackers.length; i++){
-      if(attributions.indexOf(dataWorld.attackers[i].country) == -1){
-        attributions.push(dataWorld.attackers[i].country);
-      }
+    attributions = globalAttackingCountries;
     }
-  }
+
+    //var eventFunction = selectedAttacker;
+
 
   if(mode == "victims"){
-    for(i = 0; i < dataWorld.victims.length; i++){
-      if(attributions.indexOf(dataWorld.victims[i].country) == -1){
-        attributions.push(dataWorld.victims[i].country);
-      }
+    attributions = globalVictimCountries;
     }
-  }
+
+    //var eventFunction = selectedVictim;
 
   attributions.sort();
 
   attributionListWorld.innerHTML = "";
+
 
   for(i = 0; i < attributions.length; i++){
 
@@ -884,7 +988,7 @@ const updateWorldAttributions = function(mode){
     input.className = "attributionInput";
     input.value = attributions[i];
     input.name = "attributionButtonWorld";
-    //input.addEventListener("change", filterAttacks);
+    input.addEventListener("change", countrySelected);
 
     label.appendChild(input);
 
@@ -898,9 +1002,6 @@ const updateWorldAttributions = function(mode){
 const attackSelectorArrow = function(direction){
 
   var maxPage = Math.floor(attacksToInspect.length / 3 );
-
-
-
 
   if(direction == "up" && attackSelectorCurrentPage < maxPage){
 
@@ -949,6 +1050,14 @@ const attackSelectorArrow = function(direction){
 
     fillAttackButtons();
   }
+
+}
+
+const updatePageCounter = function(){
+  var maxPage = Math.floor(attacksToInspect.length / 3 )+1;
+  var currentPage = attackSelectorCurrentPage + 1;
+
+  attackSelectorPageCoutner.innerHTML = currentPage + " / "+ maxPage;
 }
 
 const fillAttackButtons = function(){
@@ -980,6 +1089,7 @@ const fillAttackButtons = function(){
     }
   }
 
+  updatePageCounter();
 }
 
 const updateAttackInfosContent = function(id){
@@ -995,6 +1105,7 @@ const updateAttackInfosContent = function(id){
 
   var aliases = "";
   var sectors = "";
+  var motivations = "";
 
   for(i = 0; i < selectedAttack[0].threatActor.aliases.length; i++){
     aliases = aliases + selectedAttack[0].threatActor.aliases[i].name + " / ";
@@ -1004,12 +1115,23 @@ const updateAttackInfosContent = function(id){
     sectors = sectors + selectedAttack[0].sectors[i].name + " / ";
   }
 
+  for(i = 0; i < selectedAttack[0].threatActor.motivations.length; i++){
+    motivations = motivations + selectedAttack[0].threatActor.motivations[i].name + " / ";
+  }
+
   aliases = aliases.slice(0, -3);
+
   if(aliases){
     aliases = "aka "+ aliases;
   }
 
   sectors = sectors.slice(0, -3);
+
+  motivations = motivations.slice(0, -3);
+
+  if(!motivations){
+    motivations = "unknown"
+  }
 
 
 
@@ -1017,7 +1139,7 @@ const updateAttackInfosContent = function(id){
     chronologyDateInfection.innerHTML = moment(selectedAttack[0].infectionDate).format("DD-MM-YYYY");
   }
   else{
-    chronologyDateInfection.innerHTML = "unkown";
+    chronologyDateInfection.innerHTML = "unknown";
   }
 
   if(selectedAttack[0].cleanupDate){
@@ -1033,6 +1155,7 @@ const updateAttackInfosContent = function(id){
   threatActorAliases.innerHTML = aliases;
   threatActorCountry.innerHTML = selectedAttack[0].threatActor.country;
   threatActorDescription.innerHTML = selectedAttack[0].threatActor.campaignDescription;
+  threatActorMotivation.innerHTML = motivations;
 
   victimName.innerHTML = selectedAttack[0].company;
   victimLocation.innerHTML = selectedAttack[0].city;
@@ -1044,6 +1167,93 @@ const updateAttackInfosContent = function(id){
 
 }
 
+const updateActorButtons = function(actors){
+
+  document.getElementById("actorList").innerHTML = "";
+
+  for(i = 0; i < actorsToInspect.length; i++){
+
+    console.log("adding button " + actorsToInspect[i].name);
+    var label = document.createElement("label");
+    label.className = "attributionButton";
+    document.getElementById("actorList").appendChild(label);
+
+
+    var input = document.createElement("input");
+    input.type = "radio";
+    input.className = "attributionInput";
+    input.value = actorsToInspect[i].name;
+    input.name = "actorButton";
+    input.addEventListener("change", actorSelected);
+
+
+    label.appendChild(input);
+
+    var span = document.createElement("span");
+    span.innerHTML = actorsToInspect[i].name;
+    label.appendChild(span);
+
+  }
+
+  //trigger click on the first button
+
+  if(document.getElementById("actorList").firstChild){
+    document.getElementById("actorList").firstChild.click();
+  }
+  else{
+
+    document.getElementById("threatActorName_popupWorld").innerHTML = "No Actors Available"
+    document.getElementById("threatActorAliases_popupWorld").innerHTML = "";
+    document.getElementById("threatActorMotivation_popupWorld").innerHTML = "";
+    document.getElementById("threatActorDescription_popupWorld").innerHTML = "";
+
+  }
+
+}
+
+const actorSelected = function(event){
+
+  var selectedCountry = activeFocus.slice(6);
+
+  var actorName = event.target.value;
+
+  var elements = actorsToInspect.filter(function(el) {
+      return el.name.indexOf(actorName) > -1;
+  });
+  var actorElement = elements[0];
+
+  var aliases = "";
+  var motivations = "";
+
+  for(i = 0; i < actorElement.aliases.length; i++){
+    aliases = aliases + actorElement.aliases[i].name + " / ";
+  }
+
+
+  for(i = 0; i < actorElement.motivations.length; i++){
+    motivations = motivations + actorElement.motivations[i].name + " / ";
+  }
+
+  aliases = aliases.slice(0, -3);
+
+  if(aliases){
+    aliases = "aka "+ aliases;
+  }
+
+  motivations = motivations.slice(0, -3);
+
+  if(!motivations){
+    motivations = "unknown"
+  }
+
+  document.getElementById("threatActorName_popupWorld").innerHTML = actorElement.name;
+  document.getElementById("threatActorAliases_popupWorld").innerHTML = aliases;
+  document.getElementById("threatActorMotivation_popupWorld").innerHTML = motivations;
+  document.getElementById("threatActorDescription_popupWorld").innerHTML = actorElement.campaignDescription;
+
+
+
+}
 
 
 const scene = createScene(); //Call the createScene function
@@ -1073,17 +1283,28 @@ window.addEventListener("resize", function () {
 
 
 
-// Debut Layer Shortcut
+// Debug Layer Shortcut
 document.addEventListener('keydown', function (event) {
   // ctrl + alt + d shortcut
-  if (event.ctrlKey && event.altKey && event.key === 'd' && debug == false) {
-    scene.debugLayer.show({overlay: true});
-    debug = true;
+  if (event.ctrlKey && event.altKey && event.key === 'd') {
+
+    if(debug == false){
+      scene.debugLayer.show({overlay: true});
+      debug = true;
+      document.getElementById("sidebar_left").style.visibility ="hidden";
+      document.getElementById("sidebar_right").style.visibility ="hidden";
+    }
+
+    else{
+      scene.debugLayer.hide();
+      debug = false;
+      document.getElementById("sidebar_left").style.visibility ="visible";
+      document.getElementById("sidebar_right").style.visibility ="visible";
+
+    }
+
+
   }
 
-  if (event.ctrlKey && event.altKey && event.key === 'd' && debug == true) {
-    scene.debugLayer.hide();
-    debug = false;
-  }
 
 });

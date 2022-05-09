@@ -50,9 +50,6 @@ for(i = 1; i <= 5; i++){
 
 }
 
-console.log(originNames);
-console.log(originValues);
-console.log(originBars);
 
 const evaluateStatisticsSelection = function(){
 
