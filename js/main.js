@@ -278,7 +278,7 @@ const runRenderLoop = function(){
 
 const loadModels = function(){ // Load gltf, populate global mesh variables, disable pickability on all meshes
 
-  BABYLON.SceneLoader.Append("gltf/", "cyberDashboard.gltf", scene , function (scene) {
+  BABYLON.SceneLoader.Append("gltf/", "cyberDashboard.glb", scene , function (scene) {
     console.log("models loaded");
 
       scene.meshes[0].name = "root";
