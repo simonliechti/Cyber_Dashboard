@@ -256,10 +256,24 @@ body {
 
 #attackSelectorContentWrapper{
   display: flex;
-  width: 30vh;
+  width: 35vh;
   flex-wrap: wrap;
   justify-content: center;
   align-items: center;
+}
+
+#attackSelectorContent{
+  padding: 0 3vh;
+  background-color: var(--blue1);
+  overflow: hidden;
+  border-style: solid;
+  border-image-source: url("textures/border_texture.png");
+  border-image-slice:7;
+  border-image-width: 0.5vh;
+  border-image-outset: .2vh;
+  border-image-repeat: stretch;
+  pointer-events: visible;
+  opacity: 1;
 }
 
 
@@ -269,13 +283,6 @@ body {
   transform: translateY(-1vh);
   align-items: center;
   justify-content: center;
-  /* background-color: var(--blue1);
-  border-style: solid;
-  border-image-slice:7;
-  border-image-width: 0.5vh;
-  border-image-outset: .2vh;
-  border-image-repeat: stretch;
-  border-image-source: url("textures/border_texture.png"); */
   box-shadow:var(--shadow);
   border-style: solid;
   border-width: .15vh;
@@ -294,7 +301,7 @@ body {
 }
 
 .attackSelectorArrow:hover{
-  transform: scale(1.1);
+  /* transform: scale(1.1); */
   opacity: 1;
 }
 
@@ -969,20 +976,6 @@ body {
 }
 
 
-#attackSelectorContent{
-  border-style: solid;
-  background-color: var(--blue1);;
-  padding: 0 3vh;
-  border-style: solid;
-  border-image-slice:7;
-  border-image-width: 0.5vh;
-  border-image-outset: .2vh;
-  border-image-repeat:stretch;
-  border-image-source: url("textures/border_texture.png");
-  pointer-events: visible;
-  opacity: 1;
-
-}
 
 /* attack selector buttons */
 
@@ -1031,7 +1024,7 @@ body {
 
 .attackButton:hover span {
     /* background: var(--blue2) !important; */
-    transform: scale(1.04);
+    /* transform: scale(1.04); */
     background-color: var(--blue0);
 }
 
@@ -1077,7 +1070,7 @@ body {
   /* color: white; */
   background-color: var(--blue0);
   border-color: var(--blue4);
-  transform: scale(1.04);
+  /* transform: scale(1.04); */
   box-shadow: 0px 0px .5vh hsl(218, 20%, 50%);
 }
 
