@@ -247,15 +247,21 @@ const COUNTRYCODES = {
 
 var getIsoCode = function(country){
 
-
-    return this.extractKeyValue(COUNTRYCODES, country);
-
-
-
+      var code = extractKeyValue(COUNTRYCODES, country);
+    console.log(COUNTRYCODES);
+    console.log(code);
+    return code;
 };
 
 
 var extractKeyValue = function(obj, value){
 
-    return Object.keys(obj)[Object.values(obj).indexOf(value)];
+
+    return Object.keys(obj)[objectValues(obj).indexOf(value)];
 };
+
+function objectValues(obj) {
+   return Object.keys(obj).map(function(k) {
+      return obj[k];
+   });
+}
