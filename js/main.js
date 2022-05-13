@@ -19,6 +19,19 @@ cssVars({
 
 //Add events on html Objects
 //
+
+document.getElementById("buttonFullscreen").onclick = function(){
+  if (document.fullscreenElement) {
+        document.exitFullscreen();
+    }
+  else{
+    var element = document.body;
+    requestFullscreen(element);
+  }
+
+};
+
+
 document.getElementById("buttonModeWorld").onclick = function(){
   focusChange("world");
 };
@@ -125,6 +138,8 @@ const victimSectors = document.getElementById("victimSectors");
 
 const attackInfoDetail = document.getElementById("attackInfoDetail");
 const attackDamage = document.getElementById("attackDamage");
+
+const buttonFullscreen = document.getElementById("buttonFullscreen");
 
 //
 //
@@ -244,6 +259,20 @@ engine.loadingScreen = loadingScreen;
 //mapRange function
 const mapRange = function (value, in_min, in_max, out_min, out_max) {
   return (value - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+}
+
+const requestFullscreen = function(element){
+  // Supports most browsers and their versions.
+    var requestMethod = element.requestFullScreen || element.webkitRequestFullScreen || element.mozRequestFullScreen || element.msRequestFullScreen;
+
+    if (requestMethod) { // Native full screen.
+        requestMethod.call(element);
+    } else if (typeof window.ActiveXObject !== "undefined") { // Older IE.
+        var wscript = new ActiveXObject("WScript.Shell");
+        if (wscript !== null) {
+            wscript.SendKeys("{F11}");
+        }
+    }
 }
 
 const createScene = function() { // create new BABYLON Scene, Scene Optimizer & Camera
