@@ -20,17 +20,10 @@ cssVars({
 //Add events on html Objects
 //
 
-document.getElementById("buttonFullscreen").onclick = function(){
-  if (document.fullscreenElement) {
-        document.exitFullscreen();
-    }
-  else{
-    var element = document.body;
-    requestFullscreen(element);
-  }
+document.getElementById("buttonFullscreen").getElementsByTagName("input")[0].addEventListener("change", function(event){
 
-};
-
+  goFullscreen();
+});
 
 document.getElementById("buttonModeWorld").onclick = function(){
   focusChange("world");
@@ -261,19 +254,38 @@ const mapRange = function (value, in_min, in_max, out_min, out_max) {
   return (value - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
 
-const requestFullscreen = function(element){
-  // Supports most browsers and their versions.
-    var requestMethod = element.requestFullScreen || element.webkitRequestFullScreen || element.mozRequestFullScreen || element.msRequestFullScreen;
+const goFullscreen = function(){
 
-    if (requestMethod) { // Native full screen.
-        requestMethod.call(element);
-    } else if (typeof window.ActiveXObject !== "undefined") { // Older IE.
-        var wscript = new ActiveXObject("WScript.Shell");
-        if (wscript !== null) {
-            wscript.SendKeys("{F11}");
-        }
+
+  console.log("toggle Fullscreen");
+  console.log(document.fullscreenElement);
+  if (document.fullscreenElement || document.msFullscreenElement || document.mozFullScreenElement) {
+    console.log("exiting fullscreen");
+    if (document.exitFullscreen) {
+        document.exitFullscreen();
+    } else if (document.msExitFullscreen) {
+        document.msExitFullscreen();
+    } else if (document.mozCancelFullScreen) {
+        document.mozCancelFullScreen();
+    } else if (document.webkitExitFullscreen) {
+        document.webkitExitFullscreen();
     }
+  }
+  else{
+    if (document.body.requestFullscreen) {
+        document.body.requestFullscreen();
+    } else if (document.body.mozRequestFullScreen) {
+    document.body.mozRequestFullScreen(); // Firefox
+    } else if (document.body.webkitRequestFullscreen) {
+        document.body.webkitRequestFullscreen(); // Chrome and Safari
+    } else if (document.body.msRequestFullscreen) {
+        document.body.msRequestFullscreen(); // IE
+    }
+  }
+
+
 }
+
 
 const createScene = function() { // create new BABYLON Scene, Scene Optimizer & Camera
 
