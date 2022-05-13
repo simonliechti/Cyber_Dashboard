@@ -56,7 +56,7 @@ body {
   background: -ms-radial-gradient(center, circle, hsl(218, 30%, 10%) ,hsl(218, 35%, 6%));
   /* background: radial-gradient(#0A0E15 ,#080C11); */
   /* background-color: black; */
-  z-index: -2;
+  z-index: -10;
 }
 
 #renderCanvas {
@@ -780,6 +780,61 @@ body {
   justify-content: center;
 
 }
+
+.iconButton{
+  margin-top: 6vh;
+  margin-left: 2vh;
+  margin-right: 2vh;
+  width: 3vh;
+  height: 3vh;
+  pointer-events: all;
+}
+
+
+
+.iconInput{
+  visibility: collapse;
+  position: absolute;
+}
+
+
+
+#buttonLoop{
+  background-image: url("textures/loop.svg");
+  background-size: auto;
+  background-position: center;
+  width: 100%;
+  height: 100%;
+  display: inline-block;
+  overflow: visible;
+  opacity: 0.5;
+}
+
+#buttonLoop:hover{
+  opacity: 1;
+}
+
+
+
+#buttonFullscreen{
+  background-image: url("textures/fullscreen.svg");
+  background-size: auto;
+  background-position: center;
+  width: 100%;
+  height: 100%;
+  display: inline-block;
+  overflow: visible;
+  opacity: 0.5;
+}
+
+#buttonFullscreen:hover{
+  opacity: 1;
+}
+
+#buttonFullscreen input:checked{
+  opacity: 1;
+}
+
 
 
 #headerTitel{
